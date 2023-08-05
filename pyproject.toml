@@ -1,5 +1,8 @@
 [build-system]
-requires = ["setuptools>=61.0.0",]
+requires = ["setuptools>=44.0.0",]
+
+[tool.setuptools]
+py-modules = []
 
 [project]
 name = "adsaffildb"
@@ -9,5 +12,5 @@ license = {text = "GPL-3.0-only"}
 readme = "README.md"
 requires-python = ">=3.8"
 authors = [ {name = "Matthew Templeton", email = "matthew.templeton@cfa.harvard.edu"} ]
-maintainers = [ {name = "NASA ADS/SciX @ Center for Astrophysics | Harvard and Smithsonian", email = "adshelp@cfa.harvard.edu"}]
+maintainers = [ {name = "NASA ADS/SciX @ Center for Astrophysics | Harvard and Smithsonian", email = "ads@cfa.harvard.edu"}]
 dependencies = ["alembic==1.10.4", "sqlalchemy==2.0.12"]
