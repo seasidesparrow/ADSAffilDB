@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=44.0.0",]
+
+[tool.setuptools]
+py-modules = []
+
+[project]
+name = "adsaffildb"
+version = "1.0.0"
+description = "Database for storage and manipulation of affiliation data for ADS/SciX curation"
+license = {text = "GPL-3.0-only"}
+readme = "README.md"
+requires-python = ">=3.8"
+authors = [ {name = "Matthew Templeton", email = "matthew.templeton@cfa.harvard.edu"} ]
+maintainers = [ {name = "NASA ADS/SciX @ Center for Astrophysics | Harvard and Smithsonian", email = "ads@cfa.harvard.edu"}]
+dependencies = ["alembic==1.10.4", "sqlalchemy==2.0.12"]
