@@ -22,3 +22,23 @@ logger = app.logger
 app.conf.CELERY_QUEUES = (
     Queue("normalize", app.exchange, routing_key="normalize"),
 )
+
+
+def task_load_parent_child_data(data):
+    with app.session_scope() as session:
+        try:
+            session.bulk_insert_mappings(BAR, data)
+            session.commit()
+        except Exception as err:
+            session.rollback()
+            session.flush()
+            logger.warning("Failed to write parent-child data: %s" % err)
+
+
+@app.task(queue="normalize")
+def task_normalize_affils():
+    with app.session_scope() as session:
+        try:
+            x = 1
+        except Exception as err:
+            logger.warning("Normalize exception: %s" % err)
