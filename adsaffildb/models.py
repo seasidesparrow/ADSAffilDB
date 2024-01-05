@@ -1,15 +1,13 @@
-import datetime
+try:
+    from adsputils import get_date, UTCDateTime
+except ImportError:
+    from adsmutils import get_date, UTCDateTime
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import (Table, Column, Integer, Numeric, String, TIMESTAMP,
+                        ForeignKey, Boolean, Float, Text, UniqueConstraint)
+from sqlalchemy.dialects.postgresql import ENUM
 
-from typing import List, Optional
-from sqlalchemy.types import Integer, String, Text, TIMESTAMP
-from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column
-
-class Base(DeclarativeBase):
-    type_annotation_map = {
-        datetime.datetime: TIMESTAMP(timezone=True),
-    }
+Base = declarative_base()
 
 class AffilData(Base):
     """
@@ -17,45 +15,40 @@ class AffilData(Base):
     """
     __tablename__ = "affil_data"
 
-    affil_data_key: Mapped[int] = mapped_column(primary_key=True)
-    affil_data_string: Mapped[str] = mapped_column(Text)
-    affil_data_id: Mapped[str] = mapped_column(String(6))
-
-
-class AffilDataHistory(Base):
-    __tablename__ = "affil_data_history"
-
-    affil_data_hist_key: Mapped[int] = mapped_column(primary_key=True)
-    affil_data_modified_time: Mapped[datetime.datetime]
-    affil_data_key: Mapped[int] = mapped_column(Integer)
-    affil_data_string: Mapped[str] = mapped_column(Text)
-    affil_data_id: Mapped[str] = mapped_column(String(6))
+    data_key = Column(Integer, primary_key=True, unique=True)
+    data_id = Column(String(6), nullable=False)
+    data_pubstring = Column(Text, nullable=False)
+    data_created = Column(UTCDateTime, default=get_date)
+    data_updated = Column(UTCDateTime, onupdate=get_date)
 
 
 class AffilInst(Base):
     __tablename__ = "affil_inst"
 
-    affil_inst_key: Mapped[int] = mapped_column(Integer)
-    affil_inst_id: Mapped[str] = mapped_column(String(6))
-    affil_inst_canonical: Mapped[str] = mapped_column(Text)
-    affil_inst_abbreviated: Mapped[str] = mapped_column(Text)
-    affil_inst_country: Mapped[str] = mapped_column(Text)
-
-
-class AffilInstHistory(Base):
-    __tablename__ = "affil_inst_history"
-
-    affil_inst_hist_key: Mapped[int] = mapped_column(primary_key=True)
-    affil_inst_modified_time: Mapped[datetime.datetime]
-    affil_inst_key: Mapped[int] = mapped_column(primary_key=True)
-    affil_string: Mapped[str] = mapped_column(Text)
-    affil_id: Mapped[str] = mapped_column(String(6))
+    inst_key = Column(Integer, primary_key=True, unique=True)
+    inst_id = Column(String(6), unique=True, nullable=False)
+    inst_parents = Column(String, nullable=True)
+    inst_canonical = Column(String, nullable=False)
+    inst_abbreviated = Column(String, nullable=False)
+    # in place of location, we could consider using GeoAlchemy2 here
+    # especially if we can get lat-lon from ROR
+    inst_location = Column(String, nullable=True)
+    inst_country = Column(String, nullable=True)
+    inst_rorid = Column(String, nullable=True)
+    inst_created = Column(UTCDateTime, default=get_date)
 
 
 class AffilNorm(Base):
     __tablename__ = "affil_norm"
 
-    affil_norm_key: Mapped[int] = mapped_column(primary_key=True)
-    affil_norm_string: Mapped[str] = mapped_column(Text)
-    affil_id: Mapped[str] = mapped_column(String(6))
+    norm_key = Column(Integer, primary_key=True, unique=True)
+    norm_id = Column(String(6), unique=False, nullable=False)
+    norm_string = Column(Text, unique=True, nullable=False)
 
+
+class AffilCuration(Base):
+    __tablename__ = "affil_curation"
+
+    curation_count = Column(Integer, nullable=True)
+    curation_id = Column(String(6), unique=False, nullable=True)
+    curation_string = Column(Text, unique=True, nullable=False)

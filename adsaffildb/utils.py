@@ -1,7 +1,5 @@
 import logging
 
-logger = logging.FileHandler("utils.log", mode="a", encoding="utf-8")
-
 class AffIdDictException(Exception):
     pass
 
@@ -16,7 +14,7 @@ def read_match_dict(filename=None):
         with open(filename, "r") as fd:
             for line in fd.readlines():
                 matchData = line.strip().split("\t")
-                if len(matchData) <> 2:
+                if len(matchData) != 2:
                     logger.warning("Bad line in %s: %s" % filename, line.strip())
                 else:
                     matchDict[matchData[1]] = matchData[0]
@@ -30,12 +28,14 @@ def read_affid_dict(filename=None):
         affIdDict = {}
         with open(filename, "r") as fd:
             for line in fd.readlines():
-                affIdData = line.strip().split("\t")
-                country = addIdData[0]
-                parentId = addIdData[1]
-                affId = addIdData[2]
-                abbrev = addIdData[3]
-                canonical = addIdData[4]
+                affIdData = line.rstrip().split("\t")
+                if len(affIdData) != 5:
+                    print(line)
+                country = affIdData[0]
+                parentId = affIdData[1]
+                affId = affIdData[2]
+                abbrev = affIdData[3]
+                canonical = affIdData[4]
                 if not affIdDict.get(affId, None):
                     affIdDict[affId] = {"country": country,
                                         "parentId": [parentId],

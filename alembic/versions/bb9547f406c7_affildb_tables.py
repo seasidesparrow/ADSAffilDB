@@ -19,35 +19,33 @@ depends_on = None
 
 def upgrade() -> None:
 
-    op.create_table('affil_identifiers',
-                    sa.Column('masterid', sa.Integer(), autoincrement=True,
+    op.create_table('affil_inst',
+                    sa.Column('inst_key', sa.Integer(), autoincrement=True,
                               nullable=False),
-                    sa.Column('parent_id', sa.String(), nullable=True),
-                    sa.Column('affil_id', sa.String(), nullable=False),
-                    sa.Column('inst_abbrev', sa.String(), nullable=False),
-                    sa.Column('affil', sa.String(), nullable=False),
-                    sa.Column('country', sa.String(), nullable=False),
+                    sa.Column('inst_id', sa.String(), nullable=False),
+                    sa.Column('inst_parents', sa.String(), nullable=True),
+                    sa.Column('inst_canonical', sa.String(), nullable=False),
+                    sa.Column('inst_abbreviated', sa.String(), nullable=False),
+                    sa.Column('inst_location', sa.String(), nullable=True),
+                    sa.Column('inst_country', sa.String(), nullable=True),
+                    sa.Column('inst_rorid', sa.String(), nullable=True)
                     sa.Column('created', UTCDateTime, nullable=True,
                               default=get_date),
-                    sa.Column('updated', UTCDateTime, nullable=True,
-                              onupdate=get_date),
-                    sa.PrimaryKeyConstraint('masterid')
-                    sa.UniqueConstraint('masterid'))
+                    sa.PrimaryKeyConstraint('inst_key')
+                    sa.UniqueConstraint('inst_key', 'inst_id'))
 
-    op.create_table('affil_matches',
-                    sa.Column('matchid', sa.Integer(), autoincrement=True,
+    op.create_table('affil_data',
+                    sa.Column('data_key', sa.Integer(), autoincrement=True,
                               nullable=False),
-                    sa.Column('affil_id', sa.String(), nullable=False),
-                    sa.Column('affil_text', sa.String(), nullable=False),
-                    sa.Column('affil_norm', sa.String(), nullable=False),
-                    sa.Column('counts', sa.Integer(), nullable=False),
+                    sa.Column('data_id', sa.String(), nullable=False),
+                    sa.Column('data_pubstring', sa.String(), nullable=False),
                     sa.Column('created', UTCDateTime, nullable=True,
                               default=get_date),
                     sa.Column('updated', UTCDateTime, nullable=True,
                               onupdate=get_date),
-                    sa.ForeignKeyConstraint(['affil_id'], ['affil_identifiers.affil_id']),
-                    sa.PrimaryKeyConstraint('matchid')
-                    sa.UniqueConstraint('matchid', 'affil_text'))
+                    sa.ForeignKeyConstraint(['data_id'], ['affil_inst.inst_id']),
+                    sa.PrimaryKeyConstraint('data_key')
+                    sa.UniqueConstraint('data_key', 'data_pubstring'))
                    
     # end of Alembic upgrade
 

@@ -13,6 +13,7 @@ readme = "README.md"
 requires-python = ">=3.8"
 authors = [ {name = "Matthew Templeton", email = "matthew.templeton@cfa.harvard.edu"} ]
 maintainers = [ {name = "NASA ADS/SciX @ Center for Astrophysics | Harvard and Smithsonian", email = "ads@cfa.harvard.edu"}]
-dependencies = ["alembic==1.11.2", "sqlalchemy==2.0.19"]
+dependencies = ["adsputils==1.4.3", "alembic==1.11.2", "sqlalchemy==1.3.16"]
+#dependencies = ["adsputils==1.4.3", "alembic==1.11.2", "sqlalchemy==2.0.19"]
 # dependencies = ["alembic==1.11.2", "psycopg==3.1.9", "sqlalchemy==2.0.19", "SQLAlchemy-Utils==0.41.1"]
 
