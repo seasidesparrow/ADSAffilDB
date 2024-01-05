@@ -10,14 +10,15 @@ class MatchDictException(Exception):
 
 def read_match_dict(filename=None):
     try:
-        matchDict = {}
+        matchDict = []
         with open(filename, "r") as fd:
             for line in fd.readlines():
                 matchData = line.strip().split("\t")
                 if len(matchData) != 2:
                     logger.warning("Bad line in %s: %s" % filename, line.strip())
                 else:
-                    matchDict[matchData[1]] = matchData[0]
+                    match = {"affid": matchData[0], "aff": matchData[1]}
+                    matchDict.append(match)
         return matchDict
     except Exception as err:
         raise MatchDictException("Could not read curated match dictionary, %s: %s" % (filename, err))
