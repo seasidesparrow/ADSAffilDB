@@ -1,4 +1,11 @@
-import logging
+import os
+from adsputils import setup_logging, load_config
+
+proj_home = os.path.realpath(os.path.dirname(__file__))
+config = load_config(proj_home=proj_home)
+logger = setup_logging('run.py', proj_home=proj_home,
+                        level=config.get('LOGGING_LEVEL', 'INFO'),
+                        attach_stdout=config.get('LOG_STDOUT', False))
 
 class AffIdDictException(Exception):
     pass
@@ -15,7 +22,9 @@ def read_match_dict(filename=None):
             for line in fd.readlines():
                 matchData = line.strip().split("\t")
                 if len(matchData) != 2:
-                    logger.warning("Bad line in %s: %s" % filename, line.strip())
+                    print("WHAT THE HELL????")
+                    logger.warning("Bad line in %s: %s" % (filename, line.strip()))
+                    print("Bad line in %s: %s" % (filename, line.strip()))
                 else:
                     match = {"affid": matchData[0], "aff": matchData[1]}
                     matchMap.append(match)
