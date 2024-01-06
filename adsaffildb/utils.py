@@ -10,7 +10,7 @@ class MatchDictException(Exception):
 
 def read_match_dict(filename=None):
     try:
-        matchDict = []
+        matchMap = []
         with open(filename, "r") as fd:
             for line in fd.readlines():
                 matchData = line.strip().split("\t")
@@ -18,8 +18,8 @@ def read_match_dict(filename=None):
                     logger.warning("Bad line in %s: %s" % filename, line.strip())
                 else:
                     match = {"affid": matchData[0], "aff": matchData[1]}
-                    matchDict.append(match)
-        return matchDict
+                    matchMap.append(match)
+        return matchMap
     except Exception as err:
         raise MatchDictException("Could not read curated match dictionary, %s: %s" % (filename, err))
 
@@ -27,6 +27,7 @@ def read_match_dict(filename=None):
 def read_affid_dict(filename=None):
     try:
         affIdDict = {}
+        affIdMap = []
         with open(filename, "r") as fd:
             for line in fd.readlines():
                 affIdData = line.rstrip().split("\t")
@@ -38,14 +39,19 @@ def read_affid_dict(filename=None):
                 abbrev = affIdData[3]
                 canonical = affIdData[4]
                 if not affIdDict.get(affId, None):
-                    affIdDict[affId] = {"country": country,
-                                        "parentId": [parentId],
-                                        "abbrev": abbrev,
-                                        "canonical": canonical}
+                    affIdDict[affId] = {"inst_country": country,
+                                        "inst_parents": [parentId],
+                                        "inst_abbreviation": abbrev,
+                                        "inst_canonical": canonical}
                 else:
                     current = affIdDict.get(affId)
-                    current["parentId"].append(parentId)
+                    current["inst_parents"].append(parentId)
                     affIdDict[affId] = current
-        return affIdDict
+        if affIdDict:
+            for k, v in affIdDict.items():
+                rec = {**v}
+                rec.setdefault("inst_id", k)
+                affIdMap.append(rec)
+        return affIdMap
     except Exception as err:
         raise AffIdDictException("Could not read affil id dictionary: %s" % err)

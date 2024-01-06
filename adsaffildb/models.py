@@ -3,9 +3,8 @@ try:
 except ImportError:
     from adsmutils import get_date, UTCDateTime
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import (Table, Column, Integer, Numeric, String, TIMESTAMP,
-                        ForeignKey, Boolean, Float, Text, UniqueConstraint)
-from sqlalchemy.dialects.postgresql import ENUM
+from sqlalchemy import (Column, Integer, String, Text
+                        ForeignKey, UniqueConstraint)
 
 Base = declarative_base()
 
@@ -29,12 +28,13 @@ class AffilInst(Base):
     inst_id = Column(String(6), unique=True, nullable=False)
     inst_parents = Column(String, nullable=True)
     inst_canonical = Column(String, nullable=False)
-    inst_abbreviated = Column(String, nullable=False)
+    inst_abbreviation = Column(String, nullable=False)
+    inst_country = Column(String, nullable=True)
     # in place of location, we could consider using GeoAlchemy2 here
     # especially if we can get lat-lon from ROR
     inst_location = Column(String, nullable=True)
-    inst_country = Column(String, nullable=True)
     inst_rorid = Column(String, nullable=True)
+    inst_notes = Column(Text, nullable=True)
     inst_created = Column(UTCDateTime, default=get_date)
 
 
@@ -49,6 +49,7 @@ class AffilNorm(Base):
 class AffilCuration(Base):
     __tablename__ = "affil_curation"
 
+    curation_key = Column(Integer, primary_key=True, unique=True)
     curation_count = Column(Integer, nullable=True)
     curation_id = Column(String(6), unique=False, nullable=True)
     curation_string = Column(Text, unique=True, nullable=False)

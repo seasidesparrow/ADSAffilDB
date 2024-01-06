@@ -1,4 +1,5 @@
 import os
+import json
 import argparse
 from adsaffildb import tasks, utils
 from adsputils import setup_logging, load_config
@@ -41,11 +42,13 @@ def get_args():
 
 def load_parent_child(filename):
     try:
-        affIdDict = utils.read_affid_dict(filename)
+        affIdMap = utils.read_affid_dict(filename)
     except Exception as err:
         logger.error("Failed to read parent_child dictionary: %s" % err)
     else:
-        tasks.task_load_parent_child_relations(affIdDict)
+        #tasks.task_load_parent_child_relations(affIdMap)
+        print(json.dumps(affIdMap, indent=2))
+        
     return
 
 def load_matched_affils(filename):
