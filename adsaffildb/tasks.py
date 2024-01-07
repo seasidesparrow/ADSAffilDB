@@ -8,6 +8,7 @@ from sqlalchemy import func
 from adsaffildb import app as app_module
 from adsaffildb import utils
 from adsaffildb import normalize
+from adsaffildb.models import AffilData as affil_data
 from adsaffildb.models import AffilNorm as affil_norm
 
 proj_home = os.path.realpath(os.path.join(os.path.dirname(__file__), "../"))
