@@ -1,3 +1,4 @@
+import json
 import os
 
 from adsputils import load_config, setup_logging
@@ -66,6 +67,7 @@ def read_affid_dict(filename=None):
         if affIdDict:
             for k, v in affIdDict.items():
                 rec = {**v}
+                rec["inst_parents"] = json.dumps(rec["inst_parents"])
                 rec.setdefault("inst_id", k)
                 affIdMap.append(rec)
         return affIdMap
