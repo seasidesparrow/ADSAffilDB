@@ -18,7 +18,7 @@ class AffilData(Base):
 
     data_key = Column(Integer, primary_key=True, unique=True)
     data_id = Column(String(6), nullable=False)
-    data_pubstring = Column(Text, nullable=False)
+    data_pubstring = Column(Text, unique=True, nullable=False)
     data_created = Column(UTCDateTime, default=get_date)
     data_updated = Column(UTCDateTime, onupdate=get_date)
 
