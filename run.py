@@ -54,7 +54,7 @@ def get_args():
         "-n",
         "--normalize",
         dest="normalize",
-        action="store",
+        action="store_true",
         default=None,
         help="Normalize affiliations in data table",
     )
