@@ -30,7 +30,7 @@ def upgrade() -> None:
         sa.Column("inst_rorid", sa.String(), nullable=True),
         sa.Column("created", UTCDateTime, nullable=True, default=get_date),
         sa.PrimaryKeyConstraint("inst_key"),
-        sa.UniqueConstraint("inst_key", "inst_id"),
+        sa.UniqueConstraint("inst_id"),
     )
 
     op.create_table(
@@ -42,7 +42,7 @@ def upgrade() -> None:
         sa.Column("updated", UTCDateTime, nullable=True, onupdate=get_date),
         sa.ForeignKeyConstraint(["data_id"], ["affil_inst.inst_id"]),
         sa.PrimaryKeyConstraint("data_key"),
-        sa.UniqueConstraint("data_key", "data_pubstring"),
+        sa.UniqueConstraint("data_pubstring"),
     )
 
     # end of Alembic upgrade
