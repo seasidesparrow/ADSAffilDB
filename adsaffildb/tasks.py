@@ -23,10 +23,10 @@ app.conf.CELERY_QUEUES = (
 )
 
 
-def task_bulk_update_data(table, data):
+def task_bulk_insert_data(table, data):
     with app.session_scope() as session:
         try:
-            session.bulk_update_mappings(table, data)
+            session.bulk_insert_mappings(table, data)
             session.commit()
         except Exception as err:
             session.rollback()
