@@ -60,9 +60,7 @@ def load_parent_child(filename):
     except Exception as err:
         logger.error("Failed to read parent_child dictionary: %s" % err)
     else:
-        # tasks.task_bulk_insert_data(affil_inst, affIdMap)
-        print(json.dumps(affIdMap, indent=2))
-
+        tasks.task_bulk_update_data(affil_inst, affIdMap)
     return
 
 
@@ -72,9 +70,7 @@ def load_matched_affils(filename):
     except Exception as err:
         logger.error("Failed to read parent_child dictionary: %s" % err)
     else:
-        # tasks.task_bulk_insert_data(affil_data, affilDataMap)
-        with open("piffol.json", "w") as fj:
-            fj.write(json.dumps(affilDataMap, indent=2))
+        tasks.task_bulk_update_data(affil_data, affilDataMap)
     return
 
 
