@@ -19,8 +19,8 @@ class AffilData(Base):
     data_key = Column(Integer, primary_key=True, unique=True)
     data_id = Column(String(6), nullable=False)
     data_pubstring = Column(Text, unique=True, nullable=False)
-    data_created = Column(UTCDateTime, default=get_date)
-    data_updated = Column(UTCDateTime, onupdate=get_date)
+    created = Column(UTCDateTime, default=get_date)
+    updated = Column(UTCDateTime, onupdate=get_date)
 
 
 class AffilInst(Base):
@@ -37,7 +37,7 @@ class AffilInst(Base):
     inst_location = Column(String, nullable=True)
     inst_rorid = Column(String, nullable=True)
     inst_notes = Column(Text, nullable=True)
-    inst_created = Column(UTCDateTime, default=get_date)
+    created = Column(UTCDateTime, default=get_date)
 
 
 class AffilNorm(Base):
