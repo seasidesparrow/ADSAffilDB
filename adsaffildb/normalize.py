@@ -59,8 +59,8 @@ def normalize_batch(data):
             newstring = rec.get("data_pubstring", None)
             if newstring:
                 newstring = normalize_string(clean_string(newstring))
-                outrec = {"norm_id" = rec.get("data_id", None),
-                          "norm_string" = newstring}
+                outrec = {"norm_id": rec.get("data_id", None),
+                          "norm_string": newstring}
                 output.append(outrec)
         return output
     except Exception as err:
