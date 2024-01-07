@@ -50,6 +50,15 @@ def get_args():
         help="Filename to load, if different from what is in config",
     )
 
+    parser.add_argument(
+        "-n",
+        "--normalize",
+        dest="normalize",
+        action="store",
+        default=None,
+        help="Normalize affiliations in data table",
+    )
+
     args = parser.parse_args()
     return args
 
@@ -74,6 +83,7 @@ def load_matched_affils(filename):
     return
 
 
+
 def main():
     args = get_args()
 
@@ -96,6 +106,9 @@ def main():
             logger.error("No matched affiliation file name specified.")
         else:
             load_matched_affils(file_matched)
+
+    if args.normalize:
+        tasks.task_normalize_affils()
 
     return
 
