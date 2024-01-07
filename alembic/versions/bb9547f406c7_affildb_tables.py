@@ -24,10 +24,11 @@ def upgrade() -> None:
         sa.Column("inst_id", sa.String(), nullable=False),
         sa.Column("inst_parents", sa.String(), nullable=True),
         sa.Column("inst_canonical", sa.String(), nullable=False),
-        sa.Column("inst_abbreviated", sa.String(), nullable=False),
+        sa.Column("inst_abbreviation", sa.String(), nullable=False),
         sa.Column("inst_location", sa.String(), nullable=True),
         sa.Column("inst_country", sa.String(), nullable=True),
         sa.Column("inst_rorid", sa.String(), nullable=True),
+        sa.Column("inst_notes", sa.Text(), nullable=True),
         sa.Column("created", UTCDateTime, nullable=True, default=get_date),
         sa.PrimaryKeyConstraint("inst_key"),
         sa.UniqueConstraint("inst_id"),
@@ -49,7 +50,7 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    op.drop_table("affil_matches")
-    op.drop_table("affil_identifiers")
+    op.drop_table("affil_data")
+    op.drop_table("affil_inst")
 
     # end of Alembic downgrade
