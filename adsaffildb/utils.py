@@ -1,11 +1,16 @@
 import os
-from adsputils import setup_logging, load_config
+
+from adsputils import load_config, setup_logging
 
 proj_home = os.path.realpath(os.path.dirname(__file__))
 config = load_config(proj_home=proj_home)
-logger = setup_logging('run.py', proj_home=proj_home,
-                        level=config.get('LOGGING_LEVEL', 'INFO'),
-                        attach_stdout=config.get('LOG_STDOUT', False))
+logger = setup_logging(
+    "run.py",
+    proj_home=proj_home,
+    level=config.get("LOGGING_LEVEL", "INFO"),
+    attach_stdout=config.get("LOG_STDOUT", False),
+)
+
 
 class AffIdDictException(Exception):
     pass
@@ -22,15 +27,15 @@ def read_match_dict(filename=None):
             for line in fd.readlines():
                 matchData = line.strip().split("\t")
                 if len(matchData) != 2:
-                    print("WHAT THE HELL????")
                     logger.warning("Bad line in %s: %s" % (filename, line.strip()))
-                    print("Bad line in %s: %s" % (filename, line.strip()))
                 else:
-                    match = {"affid": matchData[0], "aff": matchData[1]}
+                    match = {"data_id": matchData[0], "data_pubstring": matchData[1]}
                     matchMap.append(match)
         return matchMap
     except Exception as err:
-        raise MatchDictException("Could not read curated match dictionary, %s: %s" % (filename, err))
+        raise MatchDictException(
+            "Could not read curated match dictionary, %s: %s" % (filename, err)
+        )
 
 
 def read_affid_dict(filename=None):
@@ -48,10 +53,12 @@ def read_affid_dict(filename=None):
                 abbrev = affIdData[3]
                 canonical = affIdData[4]
                 if not affIdDict.get(affId, None):
-                    affIdDict[affId] = {"inst_country": country,
-                                        "inst_parents": [parentId],
-                                        "inst_abbreviation": abbrev,
-                                        "inst_canonical": canonical}
+                    affIdDict[affId] = {
+                        "inst_country": country,
+                        "inst_parents": [parentId],
+                        "inst_abbreviation": abbrev,
+                        "inst_canonical": canonical,
+                    }
                 else:
                     current = affIdDict.get(affId)
                     current["inst_parents"].append(parentId)

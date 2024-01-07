@@ -3,7 +3,7 @@ Storage and infrastructure for affiliation data (used for augment pipeline, and 
 
 ## Installation
 
-Install via pip: 
+Install via pip:
 
 ```
 pip install git+https://github.com/seasidesparrow/ADSAffilDB

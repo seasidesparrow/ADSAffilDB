@@ -7,11 +7,7 @@ from sqlalchemy import func
 
 from adsaffildb import app as app_module
 from adsaffildb import utils
-#from adsaffildb.exceptions import LOLException, WUTException
-from adsaffildb.models import AffilData as affil_data
-from adsaffildb.models import AffilInst as affil_inst
-from adsaffildb.models import AffilNorm as affil_norm
-from adsaffildb.models import AffilCuration as affil_curation
+from adsaffildb import normalize
 
 proj_home = os.path.realpath(os.path.join(os.path.dirname(__file__), "../"))
 app = app_module.ADSAffilDBCelery(
@@ -27,15 +23,15 @@ app.conf.CELERY_QUEUES = (
 )
 
 
-def task_load_parent_child_data(data):
+def task_bulk_update_data(table, data):
     with app.session_scope() as session:
         try:
-            session.bulk_insert_mappings(affil_inst, data)
+            session.bulk_update_mappings(table, data)
             session.commit()
         except Exception as err:
             session.rollback()
             session.flush()
-            logger.warning("Failed to write parent-child data: %s" % err)
+            logger.warning("Failed to write data from file: %s" % err)
 
 
 @app.task(queue="normalize")

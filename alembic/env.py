@@ -1,7 +1,8 @@
+import os
+import sys
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
+from sqlalchemy import engine_from_config, pool
 
 from alembic import context
 
@@ -51,13 +52,13 @@ def run_migrations_offline() -> None:
 
 
 def get_app_config(key):
-    opath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    opath = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
     if opath not in sys.path:
         sys.path.insert(0, opath)
-        
+
     from adsmp.tasks import app
-    
-    print('Getting actual config for', key, app.conf.get(key))
+
+    print("Getting actual config for", key, app.conf.get(key))
     return app.conf.get(key)
 
 
@@ -70,26 +71,19 @@ def run_migrations_online() -> None:
     """
 
     cfg = config.get_section(config.config_ini_section)
-    if 'use_flask_db_url' in cfg and cfg['use_flask_db_url'] == 'true':
-        cfg['sqlalchemy.url'] = get_app_config('SQLALCHEMY_URL')
+    if "use_flask_db_url" in cfg and cfg["use_flask_db_url"] == "true":
+        cfg["sqlalchemy.url"] = get_app_config("SQLALCHEMY_URL")
 
-    engine = engine_from_config(
-        cfg,
-        prefix='sqlalchemy.',
-        poolclass=pool.NullPool)
+    engine = engine_from_config(cfg, prefix="sqlalchemy.", poolclass=pool.NullPool)
 
     connection = engine.connect()
-    context.configure(
-                connection=connection,
-                target_metadata=target_metadata
-                )
+    context.configure(connection=connection, target_metadata=target_metadata)
 
     try:
         with context.begin_transaction():
             context.run_migrations()
     finally:
         connection.close()
-
 
 
 if context.is_offline_mode():

@@ -1,40 +1,54 @@
-import os
-import json
 import argparse
+import json
+import os
+
+from adsputils import load_config, setup_logging
+
 from adsaffildb import tasks, utils
-from adsputils import setup_logging, load_config
+from adsaffildb.models import AffilCuration as affil_curation
+from adsaffildb.models import AffilData as affil_data
+from adsaffildb.models import AffilInst as affil_inst
+from adsaffildb.models import AffilNorm as affil_norm
 
 proj_home = os.path.realpath(os.path.dirname(__file__))
 config = load_config(proj_home=proj_home)
-logger = setup_logging('run.py', proj_home=proj_home,
-                        level=config.get('LOGGING_LEVEL', 'INFO'),
-                        attach_stdout=config.get('LOG_STDOUT', False))
-
+logger = setup_logging(
+    "run.py",
+    proj_home=proj_home,
+    level=config.get("LOGGING_LEVEL", "INFO"),
+    attach_stdout=config.get("LOG_STDOUT", False),
+)
 
 
 def get_args():
-    parser = argparse.ArgumentParser('Manage affiliation data for augment_pipeline')
+    parser = argparse.ArgumentParser("Manage affiliation data for augment_pipeline")
 
-    parser.add_argument('-lp',
-                        '--load_parentchild',
-                        dest='load_pc',
-                        action='store_true',
-                        default=False,
-                        help='Load parent-child information from file into db')
+    parser.add_argument(
+        "-lp",
+        "--load_parentchild",
+        dest="load_pc",
+        action="store_true",
+        default=False,
+        help="Load parent-child information from file into db",
+    )
 
-    parser.add_argument('-lm',
-                        '--load_matched',
-                        dest='load_matched',
-                        action='store_true',
-                        default=False,
-                        help='Load matched affiliation strings from file into db')
+    parser.add_argument(
+        "-lm",
+        "--load_matched",
+        dest="load_matched",
+        action="store_true",
+        default=False,
+        help="Load matched affiliation strings from file into db",
+    )
 
-    parser.add_argument('-f',
-                        '--filename',
-                        dest='filename',
-                        action='store',
-                        default=None,
-                        help='Filename to load, if different from what is in config')
+    parser.add_argument(
+        "-f",
+        "--filename",
+        dest="filename",
+        action="store",
+        default=None,
+        help="Filename to load, if different from what is in config",
+    )
 
     args = parser.parse_args()
     return args
@@ -46,19 +60,23 @@ def load_parent_child(filename):
     except Exception as err:
         logger.error("Failed to read parent_child dictionary: %s" % err)
     else:
-        #tasks.task_load_parent_child_relations(affIdMap)
+        # tasks.task_bulk_insert_data(affil_inst, affIdMap)
         print(json.dumps(affIdMap, indent=2))
-        
+
     return
+
 
 def load_matched_affils(filename):
     try:
-        affilData = utils.read_affid_dict(filename)
+        affilDataMap = utils.read_match_dict(filename)
     except Exception as err:
         logger.error("Failed to read parent_child dictionary: %s" % err)
     else:
-        tasks.task_load_matched_affils(affilData)
+        # tasks.task_bulk_insert_data(affil_data, affilDataMap)
+        with open("piffol.json", "w") as fj:
+            fj.write(json.dumps(affilDataMap, indent=2))
     return
+
 
 def main():
     args = get_args()
@@ -73,7 +91,6 @@ def main():
         else:
             load_parent_child(file_parent_child)
 
-
     if args.load_matched:
         if args.filename:
             file_matched = args.filename
@@ -84,11 +101,8 @@ def main():
         else:
             load_matched_affils(file_matched)
 
-
     return
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
-
-

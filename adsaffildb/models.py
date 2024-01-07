@@ -1,17 +1,19 @@
 try:
-    from adsputils import get_date, UTCDateTime
+    from adsputils import UTCDateTime, get_date
 except ImportError:
     from adsmutils import get_date, UTCDateTime
+
+from sqlalchemy import Column, Integer, String, Text
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import (Column, Integer, String, Text
-                        ForeignKey, UniqueConstraint)
 
 Base = declarative_base()
+
 
 class AffilData(Base):
     """
     affil_data holds the mapping of published string and affiliation ID
     """
+
     __tablename__ = "affil_data"
 
     data_key = Column(Integer, primary_key=True, unique=True)

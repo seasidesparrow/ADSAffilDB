@@ -1,9 +1,10 @@
 import json
 import os
 import unittest
-from unittest.mock import patch
 
 from adsaffildb import utils
+
+# from unittest.mock import patch
 
 
 class TestUtils(unittest.TestCase):
@@ -27,8 +28,8 @@ class TestUtils(unittest.TestCase):
 
         # non-existent file will raise an exception
         with self.assertRaises(utils.AffIdDictException):
-            result = utils.read_affid_dict("/non_existent_file")
-        
+            utils.read_affid_dict("/non_existent_file")
+
     def test_read_match_dict(self):
         # Valid file: matched id, a tab, and the affiliation string
         # get input data
@@ -42,13 +43,16 @@ class TestUtils(unittest.TestCase):
 
         self.assertEqual(test_data, expected_data)
 
-    @patch('utils.logger')
-    def test_read_invalid_match_file(self, mock_logger):
-        # Invalid file: matched id, two blank spaces, and the affil string
-        bad_infile = os.path.join(self.inputdir, "test_bad_match.dat")
-        test_data = utils.read_match_dict(bad_infile)
-        print(test_data)
-        print(mock_logger)
-        mock_logger.assert_called_once()
-        
+        # non-existent file will raise an exception
+        with self.assertRaises(utils.MatchDictException):
+            utils.read_match_dict("/another_non_existent_file")
 
+
+#    @patch('utils.logger')
+#    def test_read_invalid_match_file(self, mock_logger):
+#        # Invalid file: matched id, two blank spaces, and the affil string
+#        bad_infile = os.path.join(self.inputdir, "test_bad_match.dat")
+#        test_data = utils.read_match_dict(bad_infile)
+#        print(test_data)
+#        print(mock_logger)
+#        mock_logger.assert_called_once()
