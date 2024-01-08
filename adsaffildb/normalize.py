@@ -56,10 +56,10 @@ def normalize_batch(data):
     try:
         output = []
         for rec in data:
-            newstring = rec.get("data_pubstring", None)
+            newstring = rec[0].get("data_pubstring", None)
             if newstring:
                 newstring = normalize_string(clean_string(newstring))
-                outrec = {"norm_id": rec.get("data_id", None),
+                outrec = {"norm_id": rec[0].get("data_id", None),
                           "norm_string": newstring}
                 output.append(outrec)
         return output

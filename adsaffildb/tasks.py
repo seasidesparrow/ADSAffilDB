@@ -49,7 +49,7 @@ def task_normalize_affils():
     with app.session_scope() as session:
         try:
             results = session.query(affil_data.data_id, affil_data.data_pubstring).all()
-            norm_results = normalize.normalize_batch(results)
+            norm_results = normalize.normalize_batch(results[0])
         except Exception as err:
             logger.warning("Failed to normalize data: %s" % err)
         else:
