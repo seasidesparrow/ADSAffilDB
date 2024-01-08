@@ -55,12 +55,15 @@ def normalize_string(string):
 def normalize_batch(data):
     try:
         output = []
+        seen = {}
         for rec in data:
             newstring = rec[1]
             if newstring:
                 newstring = normalize_string(clean_string(newstring))
-                outrec = {"norm_id": rec[0],
-                          "norm_string": newstring}
+                if not seen.get(newstring, None):
+                    outrec = {"norm_id": rec[0],
+                              "norm_string": newstring}
+                    seen[newstring] = rec[0]
                 output.append(outrec)
         return output
     except Exception as err:
