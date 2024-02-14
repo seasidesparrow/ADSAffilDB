@@ -1,6 +1,7 @@
 import html
 import re
 
+
 class FixSemicolonsException(Exception):
     pass
 
@@ -18,19 +19,21 @@ class BatchNormalizeException(Exception):
 
 
 regex_norm_semicolon = re.compile(r";\s*;")
-regex_norm_punct = re.compile(r'[-!?.,;:/\\]')
+regex_norm_punct = re.compile(r"[-!?.,;:/\\]")
+
 
 # BEGIN utils also used by ADSAffilPipeline
 def fix_semicolons(string):
-    try:    
+    try:
         string_x = regex_norm_semicolon.sub(";", string).strip()
         if string_x != string:
             return fix_semicolons(string_x)
-        else:       
+        else:
             return string_x
     except Exception as err:
         raise FixSemicolonsException("Error in fix_semicolons: %s" % err)
-                    
+
+
 def clean_string(string):
     try:
         string = html.unescape(string)
@@ -39,6 +42,7 @@ def clean_string(string):
         return string
     except Exception as err:
         raise CleanStringException("Error in clean_string: %s" % err)
+
 
 def normalize_string(string):
     # normalizing consists of
@@ -50,7 +54,8 @@ def normalize_string(string):
         string = string.upper()
         return string
     except Exception as err:
-        raise NormalizeStringException('Error in normalize_string: %s' % err)
+        raise NormalizeStringException("Error in normalize_string: %s" % err)
+
 
 def normalize_batch(data):
     try:
@@ -61,8 +66,7 @@ def normalize_batch(data):
             if newstring:
                 newstring = normalize_string(clean_string(newstring))
                 if not seen.get(newstring, None):
-                    outrec = {"norm_id": rec[0],
-                              "norm_string": newstring}
+                    outrec = {"norm_id": rec[0], "norm_string": newstring}
                     seen[newstring] = rec[0]
                 output.append(outrec)
         return output

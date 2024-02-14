@@ -4,7 +4,7 @@ import unittest
 
 from adsaffildb import utils
 
-# from unittest.mock import patch
+from mock import patch
 
 
 class TestUtils(unittest.TestCase):

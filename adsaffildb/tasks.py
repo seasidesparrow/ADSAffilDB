@@ -6,8 +6,7 @@ from kombu import Queue
 from sqlalchemy import func
 
 from adsaffildb import app as app_module
-from adsaffildb import utils
-from adsaffildb import normalize
+from adsaffildb import normalize, utils
 from adsaffildb.models import AffilData as affil_data
 from adsaffildb.models import AffilNorm as affil_norm
 
@@ -20,9 +19,7 @@ app = app_module.ADSAffilDBCelery(
 )
 logger = app.logger
 
-app.conf.CELERY_QUEUES = (
-    Queue("normalize", app.exchange, routing_key="normalize"),
-)
+app.conf.CELERY_QUEUES = (Queue("normalize", app.exchange, routing_key="normalize"),)
 
 
 def task_bulk_insert_data(table, data):
@@ -35,6 +32,7 @@ def task_bulk_insert_data(table, data):
             session.flush()
             logger.warning("Failed to bulk insert data: %s" % err)
 
+
 def task_bulk_update_data(table, data):
     with app.session_scope() as session:
         try:
@@ -44,6 +42,7 @@ def task_bulk_update_data(table, data):
             session.rollback()
             session.flush()
             logger.warning("Failed to bulk update data: %s" % err)
+
 
 def task_normalize_affils():
     with app.session_scope() as session:

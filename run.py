@@ -83,7 +83,6 @@ def load_matched_affils(filename):
     return
 
 
-
 def main():
     args = get_args()
 
