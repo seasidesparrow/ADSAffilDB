@@ -1,16 +1,94 @@
-[build-system]
-requires = ["setuptools>=44.0.0",]
-
-[tool.setuptools]
-py-modules = []
-
 [project]
 name = "adsaffildb"
-version = "1.0.0"
-description = "Database for storage and manipulation of affiliation data for ADS/SciX curation"
-license = {text = "GPL-3.0-only"}
+version = "0.2.0"
+description = "Affiliation database management pipeline"
+authors = [{ name = "Matthew Templeton", email = "matthew.templeton@cfa.harvard.edu"}]
+license = { text = "MIT" }
 readme = "README.md"
-requires-python = ">=3.8"
-authors = [ {name = "Matthew Templeton", email = "matthew.templeton@cfa.harvard.edu"} ]
-maintainers = [ {name = "NASA ADS/SciX @ Center for Astrophysics | Harvard and Smithsonian", email = "ads@cfa.harvard.edu"}]
-dependencies = ["alembic==1.10.4", "sqlalchemy==2.0.12"]
+repository = "https://github.com/adsabs/ADSAffilDB"
+documentation = "https://adsaffildb.readthedocs.io"
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Libraries",
+]
+packages = [
+    "adsaffildb",
+]
+
+dependencies = [
+    'click>=8.0.3',
+    'adsputils==1.5.2',
+    'psycopg2-binary==2.9.3',
+    'SQLAlchemy-Utils==0.38.2',
+    'alembic==1.0.0',
+]
+
+
+[project.urls]
+Source = "https://github.com/adsabs/ADSAffilDB"
+Documentation = "https://adsaffildb.readthedocs.io"
+
+
+[project.optional-dependencies]
+dev = [
+    'black==23.1.0',
+    'flake8==5.0.4',
+    'isort==5.12.0',
+    'pytest==6.2.5',
+    'pyupgrade==2.29.1',
+    'pytest-mock==3.6.1',
+    'pre-commit==2.16.0',
+    'coveralls==3.3.1',
+    'mock==4.0.3',
+    'coverage==6.2',
+    'pytest-cov==3.0.0',
+    'pytest-cookies==0.6.1',
+    'semantic-release==0.1.0',
+]
+docs = [
+    'Sphinx==7.2.6',
+    'myst-parser==2.0.0',
+    'sphinx-rtd-theme==2.0.0'
+]
+
+
+[tool.semantic_release]
+branch = "main"
+version_toml = "pyproject.toml:project.version"
+version_variable = "adsaffildb/version.py:__version__"
+build_command = "flit build"
+
+[tool.pytest.ini_options]
+addopts = "-v -Wdefault --cov=adsaffildb"
+cache_dir = ".tmp/"
+
+[tool.coverage.run]
+data_file = ".tmp/.coverage"
+
+[tool.coverage.report]
+skip_empty = true
+skip_covered = true
+
+[tool.isort]
+profile = "black"
+known_first_party = ["adsaffildb", "tests"]
+
+[tool.black]
+line-length = 99 # override black's default line-length
+
+[build-system]
+requires = ["setuptools==60.10.0", "wheel", "flit_core >=3.2,<4", "ppsetuptools==2.0.2"]
+build-backend = "flit_core.buildapi"
+#build-backend = "setuptools.build_meta"
+
+# see setup.py for explanation of these
+[xsetup.entry_points]
+console_scripts = [
+    "adsaffildb=adsaffildb.cli:cli",
+]
+[xsetup]
+scripts = [
+]
