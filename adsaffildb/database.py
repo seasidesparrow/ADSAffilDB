@@ -26,6 +26,28 @@ app.conf.CELERY_QUEUES = (
 )
 
 
+def task_bulk_insert_data(app, table, data):
+    with app.session_scope() as session:
+        try:
+            session.bulk_insert_mappings(table, data)
+            session.commit()
+        except Exception as err:
+            session.rollback()
+            session.flush()
+            logger.warning("Failed to bulk insert data: %s" % err)
+
+
+def task_bulk_update_data(app, table, data):
+    with app.session_scope() as session:
+        try:
+            session.bulk_update_mappings(table, data)
+            session.commit()
+        except Exception as err:
+            session.rollback()
+            session.flush()
+            logger.warning("Failed to bulk update data: %s" % err)
+
+
 def task_normalize_affils(app):
     with app.session_scope() as session:
         try:
@@ -44,7 +66,6 @@ def task_normalize_affils(app):
                 logger.error("Failed to clear AffilNorm table: %s" % err)
             else:
                 task_bulk_insert_data(affil_norm, norm_results)
-
 
 def task_load_solr_batch(records):
     data_block = []

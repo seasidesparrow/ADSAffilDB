@@ -59,6 +59,14 @@ def get_args():
         help="Normalize affiliations in data table",
     )
 
+    parser.add_argument('-H',
+        '--harvest-affils',
+        dest='harvest',
+        action='store_true',
+        default=False,
+        help='harvest affils from solr')
+
+
     args = parser.parse_args()
     return args
 
@@ -81,6 +89,37 @@ def load_matched_affils(filename):
     else:
         tasks.task_bulk_insert_data(affil_data, affilDataMap)
     return
+
+
+def get_current_solr_affils():
+    host = conf.get("_INDEXER_HOST", "localhost")
+    port = conf.get("_INDEXER_PORT", "9983")
+    coll = conf.get("_INDEXER_COLLECTION", "collection1")
+    token = "*"
+    last_token = ""
+    nmax = conf.get("_INDEXER_MAXROWS", 5000)
+    ntries = 0
+    maxtries = conf.get("_INDEXER_MAXTRIES", 10)
+
+    url_string = conf.get("SOLR_QUERY_ALL", None)
+    if url_string:
+        while token != last_token and ntries < maxtries:
+            url = url_string % (host, port, coll, token, nmax)
+            try:
+                (new_token, documents) = utils.solr_query_one(token, url)
+            except Exception as err:
+                logger.warning("Error, query result %s: %s" % (ntries, err))
+                ntries += 1
+                if ntries == maxtries:
+                    raise SolrRetriesException("Too many Solr API query retries, aborting")
+                time.sleep(5)
+            else:
+                tasks.task_load_solr.delay(documents)
+                ntries = 0
+                last_token = token
+                token = new_token
+    else:
+        raise MissingSolrURLException("The solr query URL is missing")
 
 
 def main():
@@ -108,6 +147,9 @@ def main():
 
     if args.normalize:
         tasks.task_normalize_affils()
+
+    if args.harvest:
+        get_current_solr_affils()
 
     return
 

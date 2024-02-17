@@ -68,7 +68,7 @@ def normalize_batch(data):
                 if not seen.get(newstring, None):
                     outrec = {"norm_id": rec[0], "norm_string": newstring}
                     seen[newstring] = rec[0]
-                output.append(outrec)
+                    output.append(outrec)
         return output
     except Exception as err:
         raise BatchNormalizeException("Failed to normalize batch: %s" % err)

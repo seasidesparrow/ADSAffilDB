@@ -1,5 +1,6 @@
 import json
 import os
+import requests
 
 from adsputils import load_config, setup_logging
 
@@ -73,3 +74,54 @@ def read_affid_dict(filename=None):
         return affIdMap
     except Exception as err:
         raise AffIdDictException("Could not read affil id dictionary: %s" % err)
+
+
+def return_query(url, method="get", data="", headers="", verify=False):
+    try:
+        if method.lower() == "get":
+            rQuery = requests.get(url)
+        elif method.lower() == "post":
+            rQuery = requests.post(url, data=data, headers=headers, verify=False)       
+        if rQuery.status_code != 200:
+            raise RequestsException("Return code error: %s" % rQuery.status_code)   
+        else:
+            return rQuery.json()
+    except Exception as err:
+        raise RequestsException("Error in return_query: %s" % err)
+
+
+def solr_query_one(token="*", url=None):
+    try:
+        resp = return_query(url, method="get")
+        new_token = resp.get("nextCursorMark", None)
+    except Exception as err:
+        raise SolrQueryException("Failed Solr query: %s" % err)
+    else:
+        documents = resp.get("response", {}).get("docs", [])
+        return (new_token, documents)
+
+def parse_one_solr_record(rec):
+    record_data = []
+    try:
+        affid_rec = rec.get("aff_id", "-")
+        affil_rec = rec.get("aff", "-")
+        if len(affid_rec) == len(affil_rec):
+            for affid_auth, affil_auth in zip(affid_rec, affil_rec):
+                affids = affid_auth.split(";")
+                affil_auth = utils.clean_string(affil_auth)
+                affils = affil_auth.split(";")
+                if len(affids) == len(affils):
+                    for affid, aff in zip(affids, affils):
+                        r = {"curation_id": affid,
+                             "curation_string": aff,
+                             "curation_count": 1}
+                        record_data.append(r)
+                else:
+                    logger.warning("Mismatched affil/affid count for author: (%s, %s)" % (affids, affils))
+        else:
+            logger.warning("Mismatched affils/affids count in Solr record: %s" % rec)
+    except Exception as err:
+        logger.warning("Failed to parse solr record: %s" % err)
+    return record_data
+
+
