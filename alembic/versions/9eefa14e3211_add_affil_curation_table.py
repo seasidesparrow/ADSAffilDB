@@ -28,7 +28,6 @@ def upgrade() -> None:
         sa.Column("curation_id", sa.String(), nullable=True),
         sa.Column("curation_string", sa.Text(), nullable=False),
         sa.PrimaryKeyConstraint("curation_key"),
-        sa.UniqueConstraint("curation_string"),
     )
 
     # end of Alembic upgrade
