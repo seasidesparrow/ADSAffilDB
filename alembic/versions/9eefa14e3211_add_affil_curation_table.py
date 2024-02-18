@@ -21,9 +21,12 @@ def upgrade() -> None:
     op.create_table(
         "affil_curation",
         sa.Column("curation_key", sa.Integer(), autoincrement=True, nullable=False),
-        sa.Column("curation_count", sa.Integer(), nullable=True)
+        sa.Column("curation_count", sa.Integer(), nullable=True),
+        sa.Column("curation_collection", sa.Text(), nullable=True),
+        sa.Column("curation_refstatus", sa.Integer(), nullable=True),
+        sa.Column("curation_bibcode", sa.Text(), nullable=True),
         sa.Column("curation_id", sa.String(), nullable=True),
-        sa.Column("curation_string", sa.String(), nullable=False),
+        sa.Column("curation_string", sa.Text(), nullable=False),
         sa.PrimaryKeyConstraint("curation_key"),
         sa.UniqueConstraint("curation_string"),
     )

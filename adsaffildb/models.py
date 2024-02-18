@@ -3,7 +3,7 @@ try:
 except ImportError:
     from adsmutils import get_date, UTCDateTime
 
-from sqlalchemy import Column, Integer, String, Text
+from sqlalchemy import Column, Integer, String, Text, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -53,5 +53,8 @@ class AffilCuration(Base):
 
     curation_key = Column(Integer, primary_key=True, unique=True)
     curation_count = Column(Integer, nullable=True)
+    curation_collection = Column(Text, unique=False, nullable=True)
+    curation_refstatus = Column(Integer, unique=False, nullable=True)
+    curation_bibcode = Column(Text, unique=False, nullable=True)
     curation_id = Column(String(6), unique=False, nullable=True)
-    curation_string = Column(Text, unique=True, nullable=False)
+    curation_string = Column(Text, unique=False, nullable=False)
