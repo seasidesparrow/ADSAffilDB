@@ -4,7 +4,7 @@ import os
 
 from adsputils import load_config, setup_logging
 
-from adsaffildb import tasks, utils
+from adsaffildb import database, tasks, utils
 from adsaffildb.models import AffilCuration as affil_curation
 from adsaffildb.models import AffilData as affil_data
 from adsaffildb.models import AffilInst as affil_inst
@@ -77,7 +77,7 @@ def load_parent_child(filename):
     except Exception as err:
         logger.error("Failed to read parent_child dictionary: %s" % err)
     else:
-        tasks.task_bulk_insert_data(affil_inst, affIdMap)
+        database.db_bulk_insert_data(affil_inst, affIdMap)
     return
 
 
@@ -87,7 +87,7 @@ def load_matched_affils(filename):
     except Exception as err:
         logger.error("Failed to read parent_child dictionary: %s" % err)
     else:
-        tasks.task_bulk_insert_data(affil_data, affilDataMap)
+        database.db_bulk_insert_data(affil_data, affilDataMap)
     return
 
 
@@ -114,7 +114,7 @@ def get_current_solr_affils():
                     raise SolrRetriesException("Too many Solr API query retries, aborting")
                 time.sleep(5)
             else:
-                tasks.task_load_solr.delay(documents)
+                database.db_load_solr.delay(documents)
                 ntries = 0
                 last_token = token
                 token = new_token
@@ -146,7 +146,7 @@ def main():
             load_matched_affils(file_matched)
 
     if args.normalize:
-        tasks.task_normalize_affils()
+        database.db_normalize_affils()
 
     if args.harvest:
         get_current_solr_affils()

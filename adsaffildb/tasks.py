@@ -1,5 +1,4 @@
 import json
-import math
 import os
 
 from kombu import Queue
@@ -26,31 +25,3 @@ app.conf.CELERY_QUEUES = (
 )
 
 
-def task_normalize_affils(app):
-    with app.session_scope() as session:
-        try:
-            results = session.query(affil_data.data_id, affil_data.data_pubstring).all()
-            norm_results = normalize.normalize_batch(results)
-        except Exception as err:
-            logger.warning("Failed to normalize data: %s" % err)
-        else:
-            try:
-                session.query(affil_norm).delete()
-                session.commit()
-                logger.info("AffilNorm table cleared.")
-            except Exception as err:
-                session.rollback()
-                session.flush()
-                logger.error("Failed to clear AffilNorm table: %s" % err)
-            else:
-                task_bulk_insert_data(affil_norm, norm_results)
-
-
-def task_load_solr_batch(records):
-    data_block = []
-    for r in records:
-        data_block.extend(utils.parse_one_solr_record(r))
-    try:
-        db.bulk_insert_data(app, affil_curate, data_block)
-    except Exception as err:
-        logger.error("Failed to insert data from Solr: %s" % err)
