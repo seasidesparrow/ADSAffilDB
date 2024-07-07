@@ -22,6 +22,7 @@ logger = app.logger
 app.conf.CELERY_QUEUES = (
     Queue("normalize", app.exchange, routing_key="normalize"),
     Queue("curate", app.exchange, routing_key="curate"),
+    Query("query", app.exchange, routing_key="query"),
 )
 
 
