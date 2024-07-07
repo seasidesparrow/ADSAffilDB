@@ -1,5 +1,5 @@
-"""Empty init
-
+"""
+add_affil_norm_table
 Revision ID: c54d158658da
 Revises: bb9547f406c7
 Create Date: 2024-01-08 00:07:00.000000

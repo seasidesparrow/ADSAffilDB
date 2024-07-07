@@ -1,5 +1,5 @@
-"""Empty init
-
+"""
+affildb_tables
 Revision ID: bb9547f406c7
 Revises: 00ac51e83198
 Create Date: 2023-11-16 15:00:00.000000

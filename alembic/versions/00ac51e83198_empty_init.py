@@ -1,5 +1,5 @@
-"""Empty init
-
+"""
+empty_init
 Revision ID: 00ac51e83198
 Revises:
 Create Date: 2023-08-05 08:52:21.147008

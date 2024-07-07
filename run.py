@@ -62,24 +62,37 @@ def get_args():
     args = parser.parse_args()
     return args
 
+def write_to_database(table_def, data):
+    try:
+        blocksize = conf.get("CLASSIC_DATA_BLOCKSIZE", 10000)
+        total_rows = len(data)
+        if data and table_def:
+            i = 0
+            while i < total_rows:
+                logger.debug(
+                    "Writing to db: %s of %s rows remaining" % (len(data) - i, total_rows)
+                )
+                insertblock = data[i : (i + blocksize)]
+                tasks.task_write_block(table_def, insertblock)
+                i += blocksize
+    except Exception as err:
+        raise DBWriteException(err)
 
 def load_parent_child(filename):
     try:
-        affIdMap = utils.read_affid_dict(filename)
+        affIds = utils.read_affid_dict(filename)
+        write_to_database(affil_inst, affIds)
     except Exception as err:
-        logger.error("Failed to read parent_child dictionary: %s" % err)
-    else:
-        tasks.task_bulk_insert_data(affil_inst, affIdMap)
+        logger.error("Failed to load parent_child dictionary into db: %s" % err)
     return
 
 
 def load_matched_affils(filename):
     try:
-        affilDataMap = utils.read_match_dict(filename)
+        affilMatches = utils.read_match_dict(filename)
+        write_to_database(affil_data, affilMatches)
     except Exception as err:
         logger.error("Failed to read parent_child dictionary: %s" % err)
-    else:
-        tasks.task_bulk_insert_data(affil_data, affilDataMap)
     return
 
 
