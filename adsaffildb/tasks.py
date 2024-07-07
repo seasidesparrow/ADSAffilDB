@@ -6,7 +6,7 @@ from kombu import Queue
 from sqlalchemy import func
 
 from adsaffildb import app as app_module
-from adsaffildb import normalize, utils
+from adsaffildb import db, normalize, utils
 
 proj_home = os.path.realpath(os.path.join(os.path.dirname(__file__), "../"))
 app = app_module.ADSAffilDBCelery(

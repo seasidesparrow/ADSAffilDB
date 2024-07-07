@@ -10,6 +10,9 @@ from adsaffildb.models import AffilData as affil_data
 from adsaffildb.models import AffilInst as affil_inst
 from adsaffildb.models import AffilNorm as affil_norm
 
+class DBWriteException(Exception):
+    pass
+
 proj_home = os.path.realpath(os.path.dirname(__file__))
 config = load_config(proj_home=proj_home)
 logger = setup_logging(
@@ -64,7 +67,7 @@ def get_args():
 
 def write_to_database(table_def, data):
     try:
-        blocksize = conf.get("CLASSIC_DATA_BLOCKSIZE", 10000)
+        blocksize = config.get("CLASSIC_DATA_BLOCKSIZE", 10000)
         total_rows = len(data)
         if data and table_def:
             i = 0
