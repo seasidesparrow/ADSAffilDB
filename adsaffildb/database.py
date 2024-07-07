@@ -2,6 +2,9 @@ import os
 
 from adsputils import load_config, setup_logging
 
+class DBWriteException(Exception):
+    pass
+
 proj_home = os.path.realpath(os.path.join(os.path.dirname(__file__), "../"))
 config = load_config(proj_home=proj_home)
 logger = setup_logging(
