@@ -19,7 +19,8 @@ class BatchNormalizeException(Exception):
 
 
 regex_norm_semicolon = re.compile(r";\s*;")
-regex_norm_punct = re.compile(r"[-!?.,;:/\\]")
+regex_norm_punct = re.compile(r"[-!?.|,;:/\\]")
+regex_norm_spaces = re.compile(r"\s+")
 
 
 # BEGIN utils also used by ADSAffilPipeline
@@ -44,14 +45,18 @@ def clean_string(string):
         raise CleanStringException("Error in clean_string: %s" % err)
 
 
-def normalize_string(string):
+def normalize_string(string, kill_spaces=False, upper_case=False):
     # normalizing consists of
     # 1) removing all spaces and other punctuation with re
     # 2) converting all ascii chars to upper-case
     try:
         string = regex_norm_punct.sub(" ", string)
         string = " ".join(string.split())
-        string = string.upper()
+        string = clean_string(string)
+        if upper_case:
+            string = string.upper()
+        if kill_spaces:
+            string = regex_norm_spaces.sub("", string)
         return string
     except Exception as err:
         raise NormalizeStringException("Error in normalize_string: %s" % err)
@@ -64,11 +69,10 @@ def normalize_batch(data):
         for rec in data:
             newstring = rec[1]
             if newstring:
-                newstring = normalize_string(clean_string(newstring))
+                newstring = normalize_string(newstring)
                 if not seen.get(newstring, None):
-                    outrec = {"norm_id": rec[0], "norm_string": newstring}
+                    outrec.append({"norm_id": rec[0], "norm_string": newstring})
                     seen[newstring] = rec[0]
-                output.append(outrec)
         return output
     except Exception as err:
         raise BatchNormalizeException("Failed to normalize batch: %s" % err)
