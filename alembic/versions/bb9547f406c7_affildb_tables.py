@@ -22,7 +22,7 @@ def upgrade() -> None:
         "affil_inst",
         sa.Column("inst_key", sa.Integer(), autoincrement=True, nullable=False),
         sa.Column("inst_id", sa.String(), nullable=False),
-        sa.Column("inst_parents", sa.String(), nullable=True),
+        sa.Column("inst_parent", sa.String(), nullable=True),
         sa.Column("inst_canonical", sa.String(), nullable=False),
         sa.Column("inst_abbreviation", sa.String(), nullable=False),
         sa.Column("inst_location", sa.String(), nullable=True),

@@ -1,7 +1,11 @@
 import argparse
 import os
-from affildb import utils, normalize
+from affildb import utils, normalize, tasks
 from adsputils import load_config, setup_logging
+
+from affildb.models import AffilInst as affil_inst
+from affildb.models import AffilData as affil_data
+from affildb.models import AffilNorm as affil_norm
 
 proj_home = os.path.realpath(os.path.join(os.path.dirname(__file__), "./"))
 config = load_config(proj_home=proj_home)
@@ -35,6 +39,22 @@ def get_args():
 
     return parser.parse_args()
 
+def write_to_database(table_def, data):
+    try:
+        blocksize = config.get("BLOCKSIZE", 2000)
+        total_rows = len(data)
+        if data and table_def:
+            i = 0
+            while i < total_rows:
+                logger.debug(
+                    "Writing to db: %s of %s rows remaining" % (len(data) - i, total_rows)
+                )
+                datablock = data[i : (i + blocksize)]
+                insertblock = [table_def.toTableRow(x) for x in datablock]
+                tasks.task_write_block(table_def, insertblock)
+                i += blocksize
+    except Exception as err:
+        logger.error("Failed to write data to %s: %s" % (table_def, err))
 
 def main():
 
@@ -47,6 +67,8 @@ def main():
         dataParentChild = utils.read_flat_files(infile,
                                                 with_header,
                                                 delimiter)
+        write_to_database(affil_inst, dataParentChild)
+        
 
     if args.load_affs:
         infile = config.get("EXISTING_ID_FILE", "./data/Affils.tsv")

@@ -35,8 +35,8 @@ class AffilInst(Base):
     __tablename__ = "affil_inst"
 
     inst_key = Column(Integer, primary_key=True, unique=True)
-    inst_id = Column(String(6), unique=True, nullable=False)
-    inst_parents = Column(String, nullable=True)
+    inst_id = Column(String(6), unique=False, nullable=False)
+    inst_parent = Column(String(6), nullable=True)
     inst_canonical = Column(String, nullable=False)
     inst_abbreviation = Column(String, nullable=False)
     inst_country = Column(String, nullable=True)
@@ -46,6 +46,14 @@ class AffilInst(Base):
     inst_rorid = Column(String, nullable=True)
     inst_notes = Column(Text, nullable=True)
     created = Column(UTCDateTime, default=get_date)
+
+    def toTableRow(rowdat):
+        if len(rowdat) == 5:
+            return {"inst_country": rowdat[0],
+                    "inst_parent": rowdat[1],
+                    "inst_id": rowdat[2],
+                    "inst_abbreviation": rowdat[3],
+                    "inst_canonical": rowdat[4]}
 
 
 class AffilCuration(Base):

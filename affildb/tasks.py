@@ -5,12 +5,13 @@ import os
 from kombu import Queue
 from sqlalchemy import func
 
-from adsaffildb import app as app_module
-from adsaffildb import normalize, utils
-from adsaffildb.models import AffilData as affil_data
-from adsaffildb.models import AffilNorm as affil_norm
+from affildb import app as app_module
+from affildb import normalize, utils
+from affildb.models import AffilData as affil_data
+from affildb.models import AffilNorm as affil_norm
+from affildb.models import AffilInst as affil_inst
 
-import adsaffildb.database as db
+import affildb.database as db
 
 proj_home = os.path.realpath(os.path.join(os.path.dirname(__file__), "../"))
 app = app_module.ADSAffilDBCelery(
@@ -27,12 +28,16 @@ app.conf.CELERY_QUEUES = (
     Queue("write-db", app.exchange, routing_key="write-db"),
 )
 
+class DBWriteException(Exception):
+    pass
+
 @app.task(queue="write-db")
 def task_write_block(table, datablock):
     try:
-        db.write_block(app, table, datablock)
+        db.write_block_to_table(app, table, datablock)
     except Exception as err:
         logger.warning("Unable to write block to db: %s" % err)
+
 
 @app.task(queue="augment")
 def task_query_one_affil(input_string, normalize=True):
