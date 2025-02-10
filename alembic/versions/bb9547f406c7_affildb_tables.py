@@ -43,7 +43,7 @@ def upgrade() -> None:
         sa.Column("updated", UTCDateTime, nullable=True, onupdate=get_date),
         sa.ForeignKeyConstraint(["affil_id"], ["affil_inst.inst_id"]),
         sa.PrimaryKeyConstraint("data_key"),
-        sa.UniqueConstraint("data_pubstring"),
+        sa.UniqueConstraint("affil_string"),
     )
 
     op.create_table(
