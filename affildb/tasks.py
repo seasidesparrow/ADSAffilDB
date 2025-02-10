@@ -13,14 +13,14 @@ from affildb.models import AffilInst as affil_inst
 
 import affildb.database as db
 
-proj_home = os.path.realpath(os.path.join(os.path.dirname(__file__), "../"))
-app = app_module.ADSAffilDBCelery(
-    "affildb-pipeline",
-    proj_home=proj_home,
-    config=globals().get("config", {}),
-    local_config=globals().get("local_config", {}),
-)
-logger = app.logger
+#proj_home = os.path.realpath(os.path.join(os.path.dirname(__file__), "../"))
+app = app_module.ADSAffilDBCelery('affildb-pipeline')
+#    "affildb-pipeline",
+#    proj_home=proj_home,
+#    config=globals().get("config", {}),
+#    local_config=globals().get("local_config", {}),
+#)
+#logger = app.logger
 
 app.conf.CELERY_QUEUES = (
     Queue("normalize", app.exchange, routing_key="normalize"),
@@ -36,7 +36,7 @@ def task_write_block(table, datablock):
     try:
         db.write_block_to_table(app, table, datablock)
     except Exception as err:
-        logger.warning("Unable to write block to db: %s" % err)
+        app.logger.warning("Unable to write block to db: %s" % err)
 
 
 @app.task(queue="augment")
@@ -60,7 +60,7 @@ def task_query_one_affil(input_string, normalize=True):
         else:
             return
     except Exception as err:
-        logger.error("Query failed for '%s': %s" % (str(input_string),err))
+        app.logger.error("Query failed for '%s': %s" % (str(input_string),err))
         return
                     
 
@@ -71,26 +71,26 @@ def task_process_block(data):
         if norm_data:
             db.write_block_to_table(app, affil_norm, norm_data)
         else:
-            logger.warning("Normalize.normalize_block returned no data!")
+            app.logger.warning("Normalize.normalize_block returned no data!")
     except Exception as err:
-        logger.error("Normalize block failed! %s" % err)
+        app.logger.error("Normalize block failed! %s" % err)
 
 def task_normalize_all():
     try:
         db.clear_table(app, affil_norm)
     except Exception as err:
-        logger.error("Failed to clear affil_norm table: %s" % err)
+        app.logger.error("Failed to clear affil_norm table: %s" % err)
     else:
-        logger.debug("Affil_norm table has been cleared.")
+        app.logger.debug("Affil_norm table has been cleared.")
         try:
             result = db.fetch_full_table(app, affil_data)
-            logger.debug("Affil_data table has been fetched.")
+            app.logger.debug("Affil_data table has been fetched.")
             if result:
                 blocksize = app.conf.get("BLOCKSIZE", 1000)
                 total_rows = len(result)
                 i = 0
                 while i < total_rows:
-                    logger.debug(
+                    app.logger.debug(
                         "Writing to db: %s of %s rows remaining" % 
                             (len(data) - i, total_rows)
                     )
@@ -98,6 +98,6 @@ def task_normalize_all():
                     tasks.task_process_block.delay(processblock)
                     i += blocksize
         except Exception as err:
-            logger.error("Failed to normalize affil_data table: %s" % err)
+            app.logger.error("Failed to normalize affil_data table: %s" % err)
         else:
-            logger.info("affil_data has been normalized in affil_norm")
+            app.logger.info("affil_data has been normalized in affil_norm")
