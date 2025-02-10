@@ -41,7 +41,7 @@ def upgrade() -> None:
         sa.Column("affil_string", sa.String(), nullable=False),
         sa.Column("created", UTCDateTime, nullable=True, default=get_date),
         sa.Column("updated", UTCDateTime, nullable=True, onupdate=get_date),
-        sa.ForeignKeyConstraint(["data_id"], ["affil_inst.inst_id"]),
+        sa.ForeignKeyConstraint(["affil_id"], ["affil_inst.inst_id"]),
         sa.PrimaryKeyConstraint("data_key"),
         sa.UniqueConstraint("data_pubstring"),
     )
