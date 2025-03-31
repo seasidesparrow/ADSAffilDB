@@ -44,7 +44,7 @@ def merge_parents(parentChildData):
             child = row[2]
             if not seen.get(child, None):
                 if pcdict.get(child, None):
-                    row[1] = pcdict[child]
+                    row[1] = "; ".join(pcdict[child])
                 uniqued.append(row)
                 seen[child] = 1
         return uniqued
