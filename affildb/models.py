@@ -3,7 +3,7 @@ try:
 except ImportError:
     from adsmutils import get_date, UTCDateTime
 
-from sqlalchemy import Column, Integer, String, Text
+from sqlalchemy import Column, Integer, String, Text, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()

@@ -5,12 +5,12 @@ import os
 from kombu import Queue
 from sqlalchemy import func
 
-from adsaffildb import app as app_module
-from adsaffildb import normalize, utils
-from adsaffildb.models import AffilData as affil_data
-from adsaffildb.models import AffilNorm as affil_norm
+from affildb import app as app_module
+from affildb import normalize, utils
+from affildb.models import AffilData as affil_data
+from affildb.models import AffilNorm as affil_norm
 
-import adsaffildb.database as db
+import affildb.database as db
 
 proj_home = os.path.realpath(os.path.join(os.path.dirname(__file__), "../"))
 app = app_module.ADSAffilDBCelery(
