@@ -58,7 +58,7 @@ class AffilInst(Base):
     def toRow(rowdat):
         if len(rowdat) == 5:
             return {"inst_country": rowdat[0],
-                    "inst_parent": rowdat[1],
+                    "inst_parents": rowdat[1],
                     "inst_id": rowdat[2],
                     "inst_abbreviation": rowdat[3],
                     "inst_canonical": rowdat[4]}
