@@ -50,7 +50,7 @@ def write_to_database(table_def, data):
                     "Writing to db: %s of %s rows remaining" % (len(data) - i, total_rows)
                 )
                 datablock = data[i : (i + blocksize)]
-                insertblock = [table_def.toTableRow(x) for x in datablock]
+                insertblock = [table_def.toRow(x) for x in datablock]
                 tasks.task_write_block(table_def, insertblock)
                 i += blocksize
     except Exception as err:

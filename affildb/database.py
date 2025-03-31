@@ -1,7 +1,7 @@
 import os
 
 from adsputils import load_config, setup_logging
-from sqlalchemy import func
+from sqlalchemy import func, insert
 
 
 proj_home = os.path.realpath(os.path.join(os.path.dirname(__file__), "../"))
