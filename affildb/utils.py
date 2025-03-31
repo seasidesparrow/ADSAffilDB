@@ -25,3 +25,9 @@ def read_flat_files(infile=None, with_header=True, delimiter="\t"):
     except Exception as err:
         raise ReadPCFileException("%s" % str(err))
 
+
+def merge_parents(parentChildData):
+    if parentChildData:
+        pcdict = {}
+        for row in parentChildData:
+            print(row)

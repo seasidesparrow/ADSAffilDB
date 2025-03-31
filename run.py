@@ -67,6 +67,7 @@ def main():
         dataParentChild = utils.read_flat_files(infile,
                                                 with_header,
                                                 delimiter)
+        uniqueParentChild = merge_parents(dataParent_child)
         write_to_database(affil_inst, dataParentChild)
         
 
