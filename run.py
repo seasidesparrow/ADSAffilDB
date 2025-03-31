@@ -68,7 +68,7 @@ def main():
                                                 with_header,
                                                 delimiter)
         uniqueParentChild = utils.merge_parents(dataParentChild)
-        write_to_database(affil_inst, dataParentChild)
+        write_to_database(affil_inst, uniqueParentChild)
         
 
     if args.load_affs:

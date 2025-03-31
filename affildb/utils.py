@@ -12,7 +12,7 @@ def read_flat_files(infile=None, with_header=True, delimiter="\t"):
             csv.QUOTE_ALL
             fileReader = csv.reader(fpc, delimiter=delimiter, quoting=csv.QUOTE_NONE)
             allData = [rowData for rowData in fileReader]
-                
+
         if allData:
             if with_header:
                 headerRow = allData[0]
