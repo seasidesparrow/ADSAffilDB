@@ -38,11 +38,13 @@ def merge_parents(parentChildData):
                 else:
                     pcdict[child] = [parent]
                 row[1] = ''
-        parentChildData = list(set(parentChildData))
         uniqued = []
+        seen = {}
         for row in parentChildData:
             child = row[2]
-            if pcdict.get(child, None):
-                row[1] = pcdict[child]
-            uniqued.append(row)
+            if not seen.get(child, None):
+                if pcdict.get(child, None):
+                    row[1] = pcdict[child]
+                uniqued.append(row)
+                seen[child] = 1
         return uniqued
