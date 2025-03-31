@@ -22,7 +22,7 @@ def upgrade() -> None:
         "affil_inst",
         sa.Column("inst_key", sa.Integer(), autoincrement=True, nullable=False),
         sa.Column("inst_id", sa.String(), nullable=False),
-        sa.Column("inst_parent", sa.String(), nullable=True),
+        sa.Column("inst_parents", sa.String(), nullable=True),
         sa.Column("inst_canonical", sa.String(), nullable=False),
         sa.Column("inst_abbreviation", sa.String(), nullable=False),
         sa.Column("inst_location", sa.String(), nullable=True),
@@ -39,11 +39,12 @@ def upgrade() -> None:
         sa.Column("data_key", sa.Integer(), autoincrement=True, nullable=False),
         sa.Column("affil_id", sa.String(), nullable=False),
         sa.Column("affil_string", sa.String(), nullable=False),
+        sa.Column("flagged", sa.Boolean(), nullable=True)
         sa.Column("created", UTCDateTime, nullable=True, default=get_date),
         sa.Column("updated", UTCDateTime, nullable=True, onupdate=get_date),
-        sa.ForeignKeyConstraint(["affil_id"], ["affil_inst.inst_id"]),
+        sa.ForeignKeyConstraint(["data_id"], ["affil_inst.inst_id"]),
         sa.PrimaryKeyConstraint("data_key"),
-        sa.UniqueConstraint("affil_string"),
+        sa.UniqueConstraint("data_pubstring"),
     )
 
     op.create_table(
@@ -60,9 +61,9 @@ def upgrade() -> None:
         sa.Column("curation_key", sa.Integer(), autoincrement=True,
             nullable=False),
         sa.Column("curation_count", sa.Integer(), nullable=True),
-        sa.Column("affil_id", sa.String(), unique=False, nullable=True),
-        sa.Column("affil_string", sa.String(), unique=True, nullable=False),
+        sa.Column("affil_id_list", sa.String(), unique=False, nullable=True),
         sa.Column("norm_string", sa.String(), unique=False, nullable=False),
+        sa.Column("notes", sa.String(), unique=False, nullable=True),
         sa.PrimaryKeyConstraint("curation_key"),
         sa.UniqueConstraint("affil_string"),
     )

@@ -5,22 +5,21 @@ import os
 from kombu import Queue
 from sqlalchemy import func
 
-from affildb import app as app_module
-from affildb import normalize, utils
-from affildb.models import AffilData as affil_data
-from affildb.models import AffilNorm as affil_norm
-from affildb.models import AffilInst as affil_inst
+from adsaffildb import app as app_module
+from adsaffildb import normalize, utils
+from adsaffildb.models import AffilData as affil_data
+from adsaffildb.models import AffilNorm as affil_norm
 
-import affildb.database as db
+import adsaffildb.database as db
 
-#proj_home = os.path.realpath(os.path.join(os.path.dirname(__file__), "../"))
-app = app_module.ADSAffilDBCelery('affildb-pipeline')
-#    "affildb-pipeline",
-#    proj_home=proj_home,
-#    config=globals().get("config", {}),
-#    local_config=globals().get("local_config", {}),
-#)
-#logger = app.logger
+proj_home = os.path.realpath(os.path.join(os.path.dirname(__file__), "../"))
+app = app_module.ADSAffilDBCelery(
+    "affildb-pipeline",
+    proj_home=proj_home,
+    config=globals().get("config", {}),
+    local_config=globals().get("local_config", {}),
+)
+logger = app.logger
 
 app.conf.CELERY_QUEUES = (
     Queue("normalize", app.exchange, routing_key="normalize"),
@@ -28,16 +27,12 @@ app.conf.CELERY_QUEUES = (
     Queue("write-db", app.exchange, routing_key="write-db"),
 )
 
-class DBWriteException(Exception):
-    pass
-
 @app.task(queue="write-db")
 def task_write_block(table, datablock):
     try:
-        db.write_block_to_table(app, table, datablock)
+        db.write_block(app, table, datablock)
     except Exception as err:
-        app.logger.warning("Unable to write block to db: %s" % err)
-
+        logger.warning("Unable to write block to db: %s" % err)
 
 @app.task(queue="augment")
 def task_query_one_affil(input_string, normalize=True):
@@ -60,7 +55,7 @@ def task_query_one_affil(input_string, normalize=True):
         else:
             return
     except Exception as err:
-        app.logger.error("Query failed for '%s': %s" % (str(input_string),err))
+        logger.error("Query failed for '%s': %s" % (str(input_string),err))
         return
                     
 
@@ -71,26 +66,26 @@ def task_process_block(data):
         if norm_data:
             db.write_block_to_table(app, affil_norm, norm_data)
         else:
-            app.logger.warning("Normalize.normalize_block returned no data!")
+            logger.warning("Normalize.normalize_block returned no data!")
     except Exception as err:
-        app.logger.error("Normalize block failed! %s" % err)
+        logger.error("Normalize block failed! %s" % err)
 
 def task_normalize_all():
     try:
         db.clear_table(app, affil_norm)
     except Exception as err:
-        app.logger.error("Failed to clear affil_norm table: %s" % err)
+        logger.error("Failed to clear affil_norm table: %s" % err)
     else:
-        app.logger.debug("Affil_norm table has been cleared.")
+        logger.debug("Affil_norm table has been cleared.")
         try:
             result = db.fetch_full_table(app, affil_data)
-            app.logger.debug("Affil_data table has been fetched.")
+            logger.debug("Affil_data table has been fetched.")
             if result:
                 blocksize = app.conf.get("BLOCKSIZE", 1000)
                 total_rows = len(result)
                 i = 0
                 while i < total_rows:
-                    app.logger.debug(
+                    logger.debug(
                         "Writing to db: %s of %s rows remaining" % 
                             (len(data) - i, total_rows)
                     )
@@ -98,6 +93,6 @@ def task_normalize_all():
                     tasks.task_process_block.delay(processblock)
                     i += blocksize
         except Exception as err:
-            app.logger.error("Failed to normalize affil_data table: %s" % err)
+            logger.error("Failed to normalize affil_data table: %s" % err)
         else:
-            app.logger.info("affil_data has been normalized in affil_norm")
+            logger.info("affil_data has been normalized in affil_norm")
