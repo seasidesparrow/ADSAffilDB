@@ -52,17 +52,19 @@ def upgrade() -> None:
         sa.Column("norm_key", sa.Integer(), autoincrement=True, nullable=False),
         sa.Column("affil_id", sa.String(), nullable=False),
         sa.Column("affil_string", sa.String(), nullable=False),
+        sa.Column("created", UTCDateTime, nullable=True, default=get_date),
         sa.PrimaryKeyConstraint("norm_key"),
+        sa.UniqueConstraint("affil_string"),
     )
 
     op.create_table(
         "affil_curation",
         sa.Column("curation_key", sa.Integer(), autoincrement=True,
             nullable=False),
-        sa.Column("curation_count", sa.Integer(), nullable=True),
-        sa.Column("affil_id_list", sa.String(), unique=False, nullable=True),
-        sa.Column("norm_string", sa.String(), unique=False, nullable=False),
-        sa.Column("notes", sa.String(), unique=False, nullable=True),
+        sa.Column("affil_id", sa.String(), nullable=True),
+        sa.Column("norm_string", sa.String(), nullable=False),
+        sa.Column("notes", sa.String(), nullable=True),
+        sa.Column("created", UTCDateTime, nullable=True, default=get_date),
         sa.PrimaryKeyConstraint("curation_key"),
     )
 

@@ -9,6 +9,34 @@ from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 
 
+class AffilInst(Base):
+    __tablename__ = "affil_inst"
+
+    inst_key = Column(Integer, primary_key=True, unique=True)
+    inst_id = Column(String(6), unique=True, nullable=False)
+    inst_parents = Column(String, nullable=True)
+    inst_canonical = Column(String, nullable=False)
+    inst_abbreviation = Column(String, nullable=False)
+    inst_country = Column(String, nullable=True)
+    # in place of location, we could consider using GeoAlchemy2 here
+    # especially if we can get lat-lon from ROR
+    inst_location = Column(String, nullable=True)
+    inst_rorid = Column(String, nullable=True)
+    inst_notes = Column(Text, nullable=True)
+    created = Column(UTCDateTime, default=get_date)
+    updated = Column(UTCDateTime, onupdate=get_date)
+
+    def toRow(rowdat):
+        if len(rowdat) == 5:
+            return {"inst_country": rowdat[0],
+                    "inst_parents": rowdat[1],
+                    "inst_id": rowdat[2],
+                    "inst_abbreviation": rowdat[3],
+                    "inst_canonical": rowdat[4]}
+        else:
+            return {}
+
+
 class AffilData(Base):
     """
     affil_data holds the mapping of published string and affiliation ID
@@ -32,45 +60,34 @@ class AffilData(Base):
 
 
 class AffilNorm(Base):
-    __tablename__ = "affil_norm"
+    __tablename__ = "affil_match"
 
     norm_key = Column(Integer, primary_key=True, unique=True)
     affil_id = Column(String(6), unique=False, nullable=False)
-    affil_string = Column(Text, unique=True, nullable=False)
-
-
-class AffilInst(Base):
-    __tablename__ = "affil_inst"
-
-    inst_key = Column(Integer, primary_key=True, unique=True)
-    inst_id = Column(String(6), unique=True, nullable=False)
-    inst_parents = Column(String, nullable=True)
-    inst_canonical = Column(String, nullable=False)
-    inst_abbreviation = Column(String, nullable=False)
-    inst_country = Column(String, nullable=True)
-    # in place of location, we could consider using GeoAlchemy2 here
-    # especially if we can get lat-lon from ROR
-    inst_location = Column(String, nullable=True)
-    inst_rorid = Column(String, nullable=True)
-    inst_notes = Column(Text, nullable=True)
+    norm_string = Column(Text, unique=True, nullable=False)
     created = Column(UTCDateTime, default=get_date)
 
     def toRow(rowdat):
-        if len(rowdat) == 5:
-            return {"inst_country": rowdat[0],
-                    "inst_parents": rowdat[1],
-                    "inst_id": rowdat[2],
-                    "inst_abbreviation": rowdat[3],
-                    "inst_canonical": rowdat[4]}
+        if len(rowdat) == 2:
+            return {"affil_id": rowdat[0],
+                    "norm_string": rowdat[1]}
         else:
             return {}
+
+
 
 class AffilCuration(Base):
     __tablename__ = "affil_curation"
 
     curation_key = Column(Integer, primary_key=True, unique=True)
-    curation_count = Column(Integer, nullable=True)
-    affil_id_list = Column(Text, unique=False, nullable=True)
+    affil_id = Column(Text, unique=False, nullable=True)
     norm_string = Column(Text, nullable=False)
     notes = Column(Text, unique=False, nullable=False)
+    created = Column(UTCDateTime, default=get_date)
 
+    def toRow(rowdat):
+        if len(rowdat) == 2:
+            return {"affil_id": rowdat[0],
+                    "norm_string": rowdat[1]}
+        else:
+            return {}

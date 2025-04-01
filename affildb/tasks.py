@@ -13,6 +13,10 @@ from affildb.models import AffilCuration as affil_curation
 
 import affildb.database as db
 
+name_to_table = {"AffilData": affil_data,
+                 "AffilNorm": affil_norm, 
+                 "AffilCuration": affil_curation}
+
 proj_home = os.path.realpath(os.path.join(os.path.dirname(__file__), "../"))
 app = app_module.ADSAffilDBCelery(
     "affildb-pipeline",
@@ -23,18 +27,12 @@ app = app_module.ADSAffilDBCelery(
 logger = app.logger
 
 app.conf.CELERY_QUEUES = (
-    Queue("normalize", app.exchange, routing_key="normalize"),
     Queue("augment", app.exchange, routing_key="augment"),
+    Queue("normalize", app.exchange, routing_key="normalize"),
     Queue("write-db", app.exchange, routing_key="write-db"),
 )
 
-@app.task(queue="write-db")
-def task_write_block(table, datablock):
-    try:
-        db.write_block_to_table(app, table, datablock)
-    except Exception as err:
-        logger.warning("Unable to write block to db: %s" % err)
-
+# pipeline query tasks
 @app.task(queue="augment")
 def task_query_one_affil(input_string, normalize=True):
     try:
@@ -47,10 +45,12 @@ def task_query_one_affil(input_string, normalize=True):
                     kill_spaces = app.conf.get("NORM_KILL_SPACES", False),
                     upper_case = app.conf.get("NORM_UPPER_CASE", False)
                 )
-                table = app.conf.get("NORMALIZED_DATA_TABLE", None)
+                table_name = app.conf.get("NORMALIZED_DATA_TABLE", None)
             else:
                 query_string = input_string
-                table = app.conf.get("RAW_DATA_TABLE", None)
+                table_name = app.conf.get("RAW_DATA_TABLE", None)
+            if table_name:
+                table = name_to_table.get(table_name, None)
         if query_string and table:
             return db.query_one_string(app, table, query_string)
         else:
@@ -58,24 +58,52 @@ def task_query_one_affil(input_string, normalize=True):
     except Exception as err:
         logger.error("Query failed for '%s': %s" % (str(input_string),err))
         return
-                    
+
+
+# data management tasks
+@app.task(queue="write-db")
+def task_write_block(table, datablock):
+    try:
+        db.write_block_to_table(app, table, datablock)
+    except Exception as err:
+        logger.warning("Unable to write block to db: %s" % err)
+
+
+def task_write_to_database(table_def, data):
+    try:
+        blocksize = config.get("BLOCKSIZE", 2000)
+        total_rows = len(data)
+        if data and table_def:
+            i = 0
+            while i < total_rows:
+                logger.debug(
+                    "Writing to db: %s of %s rows remaining" % (len(data) - i, total_rows)
+                )
+                datablock = data[i : (i + blocksize)]
+                insertblock = [table_def.toRow(x) for x in datablock]
+                task_write_block(table_def, insertblock)
+                i += blocksize
+    except Exception as err:
+        logger.error("Failed to write data to %s: %s" % (table_def, err))
+
 
 @app.task(queue="normalize")
-def task_process_block(data):
+def task_normalize_block(data):
     try:
-        #(norm_data, conflicts, failures) = normalize.normalize_block(data)
         norm_data = []
-        for d in data:
-            affid, affstring = d
+        for row in data:
+            affid = row["affil_id"]
+            affstring = row["affil_string"]
             normstring = normalize.normalize_string(affstring)
             nd = [affid, normstring]
             norm_data.append(nd)
         if norm_data:
-            db.write_block_to_table(app, affil_curation, norm_data)
+            task_write_block(affil_curation, norm_data)
         else:
             logger.warning("Normalize.normalize_block returned no data!")
     except Exception as err:
         logger.error("Normalize block failed! %s" % err)
+
 
 def task_normalize_all():
     try:
@@ -97,7 +125,7 @@ def task_normalize_all():
                             (len(result) - i, total_rows)
                     )
                     processblock = result[i : (i + blocksize)]
-                    task_process_block(processblock)
+                    task_normalize_block(processblock)
                     i += blocksize
         except Exception as err:
             logger.error("Failed to normalize affil_data table: %s" % err)

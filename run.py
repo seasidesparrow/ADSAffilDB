@@ -46,23 +46,6 @@ def get_args():
 
     return parser.parse_args()
 
-def write_to_database(table_def, data):
-    try:
-        blocksize = config.get("BLOCKSIZE", 2000)
-        total_rows = len(data)
-        if data and table_def:
-            i = 0
-            while i < total_rows:
-                logger.debug(
-                    "Writing to db: %s of %s rows remaining" % (len(data) - i, total_rows)
-                )
-                datablock = data[i : (i + blocksize)]
-                insertblock = [table_def.toRow(x) for x in datablock]
-                tasks.task_write_block(table_def, insertblock)
-                i += blocksize
-    except Exception as err:
-        logger.error("Failed to write data to %s: %s" % (table_def, err))
-
 def main():
 
     args = get_args()
@@ -75,7 +58,7 @@ def main():
                                                 with_header,
                                                 delimiter)
         uniqueParentChild = utils.merge_parents(dataParentChild)
-        write_to_database(affil_inst, uniqueParentChild)
+        tasks.task_write_to_database(affil_inst, uniqueParentChild)
         
 
     if args.load_affs:
@@ -85,7 +68,7 @@ def main():
         dataMatchedAffils = utils.read_flat_files(infile,
                                                   with_header,
                                                   delimiter)
-        write_to_database(affil_data, dataMatchedAffils)
+        tasks.task_write_to_database(affil_data, dataMatchedAffils)
 
     if args.normalize:
         tasks.task_normalize_all()
