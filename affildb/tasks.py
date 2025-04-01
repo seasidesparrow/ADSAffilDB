@@ -63,7 +63,13 @@ def task_query_one_affil(input_string, normalize=True):
 @app.task(queue="normalize")
 def task_process_block(data):
     try:
-        (norm_data, conflicts, failures) = normalize.normalize_block(data)
+        #(norm_data, conflicts, failures) = normalize.normalize_block(data)
+        norm_data = []
+        for d in data:
+            affid, affstring = d
+            normstring = normalize.normalize_string(affstring)
+            nd = [affid, normstring]
+            norm_data.append(nd)
         if norm_data:
             db.write_block_to_table(app, affil_curation, norm_data)
         else:
@@ -88,10 +94,10 @@ def task_normalize_all():
                 while i < total_rows:
                     logger.debug(
                         "Writing to db: %s of %s rows remaining" % 
-                            (len(data) - i, total_rows)
+                            (len(result) - i, total_rows)
                     )
                     processblock = result[i : (i + blocksize)]
-                    tasks.task_process_block(processblock)
+                    task_process_block(processblock)
                     i += blocksize
         except Exception as err:
             logger.error("Failed to normalize affil_data table: %s" % err)
