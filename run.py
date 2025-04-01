@@ -78,6 +78,8 @@ def main():
         dataMatchedAffils = utils.read_flat_files(infile,
                                                   with_header,
                                                   delimiter)
+        write_to_database(affil_data, dataMatchedAffils)
+
 
     if args.sanity:
         if dataMatchedAffils:
