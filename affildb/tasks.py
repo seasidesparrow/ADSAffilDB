@@ -71,7 +71,7 @@ def task_write_block(table, datablock):
 
 def task_write_to_database(table_def, data):
     try:
-        blocksize = config.get("BLOCKSIZE", 2000)
+        blocksize = app.conf.get("BLOCKSIZE", 2000)
         total_rows = len(data)
         if data and table_def:
             i = 0
@@ -116,7 +116,7 @@ def task_normalize_all():
             result = db.fetch_full_table(app, affil_data)
             logger.debug("Affil_data table has been fetched.")
             if result:
-                blocksize = app.conf.get("BLOCKSIZE", 1000)
+                blocksize = app.conf.get("BLOCKSIZE", 2000)
                 total_rows = len(result)
                 i = 0
                 while i < total_rows:
