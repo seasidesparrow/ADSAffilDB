@@ -71,6 +71,6 @@ class AffilCuration(Base):
     curation_key = Column(Integer, primary_key=True, unique=True)
     curation_count = Column(Integer, nullable=True)
     affil_id_list = Column(Text, unique=False, nullable=True)
-    norm_string = Column(Text, unique=True, nullable=False)
+    norm_string = Column(Text, nullable=False)
     notes = Column(Text, unique=False, nullable=False)
 

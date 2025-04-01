@@ -53,7 +53,6 @@ def upgrade() -> None:
         sa.Column("affil_id", sa.String(), nullable=False),
         sa.Column("affil_string", sa.String(), nullable=False),
         sa.PrimaryKeyConstraint("norm_key"),
-        sa.UniqueConstraint("affil_string"),
     )
 
     op.create_table(
@@ -65,7 +64,6 @@ def upgrade() -> None:
         sa.Column("norm_string", sa.String(), unique=False, nullable=False),
         sa.Column("notes", sa.String(), unique=False, nullable=True),
         sa.PrimaryKeyConstraint("curation_key"),
-        sa.UniqueConstraint("norm_string"),
     )
 
 

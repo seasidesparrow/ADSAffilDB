@@ -30,6 +30,13 @@ def get_args():
                         default=False,
                         help="Load matched affiliation strings from .tsv file.")
 
+    parser.add_argument("-n",
+                        "--norm",
+                        dest="normalize",
+                        action="store_true",
+                        default=False,
+                        help="Generate normalized version of affil_data")
+
     parser.add_argument("-s",
                         "--sanity",
                         dest="sanity",
@@ -80,6 +87,8 @@ def main():
                                                   delimiter)
         write_to_database(affil_data, dataMatchedAffils)
 
+    if args.norm:
+        tasks.task_normalize_all()
 
     if args.sanity:
         if dataMatchedAffils:

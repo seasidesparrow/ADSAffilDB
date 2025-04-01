@@ -9,6 +9,7 @@ from affildb import app as app_module
 from affildb import normalize, utils
 from affildb.models import AffilData as affil_data
 from affildb.models import AffilNorm as affil_norm
+from affildb.models import AffilCuration as affil_curation
 
 import affildb.database as db
 
@@ -64,7 +65,7 @@ def task_process_block(data):
     try:
         (norm_data, conflicts, failures) = normalize.normalize_block(data)
         if norm_data:
-            db.write_block_to_table(app, affil_norm, norm_data)
+            db.write_block_to_table(app, affil_curation, norm_data)
         else:
             logger.warning("Normalize.normalize_block returned no data!")
     except Exception as err:
@@ -72,7 +73,7 @@ def task_process_block(data):
 
 def task_normalize_all():
     try:
-        db.clear_table(app, affil_norm)
+        db.clear_table(app, affil_curation)
     except Exception as err:
         logger.error("Failed to clear affil_norm table: %s" % err)
     else:
@@ -90,7 +91,7 @@ def task_normalize_all():
                             (len(data) - i, total_rows)
                     )
                     processblock = result[i : (i + blocksize)]
-                    tasks.task_process_block.delay(processblock)
+                    tasks.task_process_block(processblock)
                     i += blocksize
         except Exception as err:
             logger.error("Failed to normalize affil_data table: %s" % err)
