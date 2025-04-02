@@ -54,10 +54,14 @@ def query_one_string(app, table, query_string):
             raise DBQueryException("Unable to query %s for %s: %s" % (str(table), query_string, err))
 
 
-def fetch_full_table(app, table):
+def fetch_data_table(app, table):
     with app.session_scope() as session:
         try:
-            return session.query(table).limit(100).all()
+            results = session.query(table).limit(100).all()
+            raw_data = []
+            for row in results:
+                raw_data.append([row.affil_id, row.affil_string])
+            return raw_data
         except Exception as err:
             raise DBQueryException("Unable to query %s for %s: %s" % (str(table), query_string, err))
 

@@ -92,10 +92,9 @@ def task_normalize_block(data):
     try:
         norm_data = []
         for row in data:
-            affil_id = row.affil_id
-            affil_string = row.affil_string
+            [affil_id, affil_string] = row
             normstring = normalize.normalize_string(affstring)
-            nd = [affil_id, normstring]
+            nd = affil_curation.toRow([affil_id, normstring])
             norm_data.append(nd)
         if norm_data:
             task_write_block(affil_curation, norm_data)
@@ -113,20 +112,18 @@ def task_normalize_all():
     else:
         logger.debug("Affil_norm table has been cleared.")
         try:
-            result = db.fetch_full_table(app, affil_data)
+            raw_data = db.fetch_data_table(app, affil_data)
             logger.debug("Affil_data table has been fetched.")
-            if result:
+            if raw_data:
                 blocksize = app.conf.get("BLOCKSIZE", 2000)
-                total_rows = len(result)
+                total_rows = len(raw_data)
                 i = 0
                 while i < total_rows:
                     logger.debug(
                         "Writing to db: %s of %s rows remaining" % 
-                            (len(result) - i, total_rows)
+                            (len(raw_data) - i, total_rows)
                     )
-                    processblock = result[i : (i + blocksize)]
-                    for p in processblock:
-                        print(p.affil_id)
+                    processblock = raw_data[i : (i + blocksize)]
                     task_normalize_block(processblock)
                     i += blocksize
         except Exception as err:
