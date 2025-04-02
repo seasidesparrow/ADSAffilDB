@@ -125,6 +125,8 @@ def task_normalize_all():
                             (len(result) - i, total_rows)
                     )
                     processblock = result[i : (i + blocksize)]
+                    for p in processblock:
+                        print(repr(p))
                     task_normalize_block(processblock)
                     i += blocksize
         except Exception as err:
