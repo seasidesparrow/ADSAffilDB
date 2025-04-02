@@ -37,6 +37,14 @@ def get_args():
                         default=False,
                         help="Generate normalized version of affil_data")
 
+    parser.add_argument("-ns",
+                        "--normstring",
+                        dest="normstring",
+                        action="store",
+                        default=None,
+                        help="normalize this string")
+
+
     parser.add_argument("-s",
                         "--sanity",
                         dest="sanity",
@@ -70,6 +78,9 @@ def main():
                                                   delimiter)
         tasks.task_write_to_database(affil_data, dataMatchedAffils)
 
+    if args.normstring:
+
+        
     if args.normalize:
         tasks.task_normalize_all()
 

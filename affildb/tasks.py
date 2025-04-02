@@ -130,3 +130,27 @@ def task_normalize_all():
             logger.error("Failed to normalize affil_data table: %s" % err)
         else:
             logger.info("affil_data has been normalized in affil_norm")
+
+def task_find_discrepant(data):
+    if data:            
+        try:            
+            globalDict = {}
+            discrepant = []
+            verified = []
+            for affid, affstring in data:
+                affnorm = normalize.normalize_string(affstring, kill_spaces=app.conf.get("NORM_KILL_SPACES", False), upper_case=app.conf.get("NORM_UPPER_CASE", False))
+                affdict = {"affil_id": affid, "affil_string": affstring, "norm_string": affnorm}
+                if not globalDict.get(affnorm, None):
+                    globalDict[affnorm] = [affdict]
+                else:
+                    globalDict[affnorm].append(affdict)
+            for k, v in globalDict.items():
+                if len(v) == 1:
+                    verified.append({"affil_id": v.get("affil_id"), "norm_string": v.get("norm_string"})
+                else:
+                    discrepant.extend([p for p in v])
+            if verified:
+                task_write_to_database(affil_norm, verified)
+        except Exception as err:
+            print("well that's just great: %s" % err)
+        else:
