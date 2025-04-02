@@ -57,7 +57,7 @@ def query_one_string(app, table, query_string):
 def fetch_full_table(app, table):
     with app.session_scope() as session:
         try:
-            return session.query(table).all()
+            return session.query(table).limit(100).all()
         except Exception as err:
             raise DBQueryException("Unable to query %s for %s: %s" % (str(table), query_string, err))
 
