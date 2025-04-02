@@ -57,7 +57,7 @@ def query_one_string(app, table, query_string):
 def fetch_data_table(app, table):
     with app.session_scope() as session:
         try:
-            results = session.query(table).limit(100).all()
+            results = session.query(table).all()
             raw_data = []
             for row in results:
                 raw_data.append([row.affil_id, row.affil_string])
