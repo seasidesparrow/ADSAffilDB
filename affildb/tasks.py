@@ -146,7 +146,7 @@ def task_find_discrepant(data):
                     globalDict[affnorm].append(affdict)
             for k, v in globalDict.items():
                 if len(v) == 1:
-                    verified.append({"affil_id": v.get("affil_id"), "norm_string": v.get("norm_string"}))
+                    verified.append({"affil_id": v.get("affil_id"), "norm_string": v.get("norm_string")})
                 else:
                     discrepant.extend([p for p in v])
             if discrepant:
@@ -155,4 +155,3 @@ def task_find_discrepant(data):
                 task_write_to_database(affil_norm, verified)
         except Exception as err:
             print("well that's just great: %s" % err)
-        else:
