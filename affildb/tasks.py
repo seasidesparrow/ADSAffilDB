@@ -126,7 +126,7 @@ def task_normalize_all():
                     )
                     processblock = result[i : (i + blocksize)]
                     for p in processblock:
-                        print(repr(p))
+                        print(p.affil_id)
                     task_normalize_block(processblock)
                     i += blocksize
         except Exception as err:
