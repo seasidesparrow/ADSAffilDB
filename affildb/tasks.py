@@ -93,7 +93,7 @@ def task_normalize_block(data):
         norm_data = []
         for row in data:
             [affil_id, affil_string] = row
-            normstring = normalize.normalize_string(affil_string)
+            normstring = normalize.normalize_string(affil_string, kill_spaces=app.conf.get("NORM_KILL_SPACES", False), upper_case=app.conf.get("NORM_UPPER_CASE", False))
             nd = affil_curation.toRow([affil_id, normstring])
             norm_data.append(nd)
         if norm_data:
