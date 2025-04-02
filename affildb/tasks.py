@@ -92,10 +92,10 @@ def task_normalize_block(data):
     try:
         norm_data = []
         for row in data:
-            affid = row["affil_id"]
-            affstring = row["affil_string"]
+            affil_id = row.affil_id
+            affil_string = row.affil_string
             normstring = normalize.normalize_string(affstring)
-            nd = [affid, normstring]
+            nd = [affil_id, normstring]
             norm_data.append(nd)
         if norm_data:
             task_write_block(affil_curation, norm_data)
