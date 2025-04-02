@@ -78,9 +78,6 @@ def main():
                                                   delimiter)
         tasks.task_write_to_database(affil_data, dataMatchedAffils)
 
-    if args.normstring:
-
-        
     if args.normalize:
         tasks.task_normalize_all()
 
