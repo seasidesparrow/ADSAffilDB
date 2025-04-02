@@ -97,39 +97,12 @@ def task_normalize_block(data):
             nd = affil_curation.toRow([affil_id, normstring])
             norm_data.append(nd)
         if norm_data:
-            task_write_block(affil_curation, norm_data)
+            task_write_block(affil_norm, norm_data)
         else:
             logger.warning("Normalize.normalize_block returned no data!")
     except Exception as err:
         logger.error("Normalize block failed! %s" % err)
 
-
-def task_normalize_all():
-    try:
-        db.clear_table(app, affil_curation)
-    except Exception as err:
-        logger.error("Failed to clear affil_norm table: %s" % err)
-    else:
-        logger.debug("Affil_norm table has been cleared.")
-        try:
-            raw_data = db.fetch_data_table(app, affil_data)
-            logger.debug("Affil_data table has been fetched.")
-            if raw_data:
-                blocksize = app.conf.get("BLOCKSIZE", 2000)
-                total_rows = len(raw_data)
-                i = 0
-                while i < total_rows:
-                    logger.debug(
-                        "Writing to db: %s of %s rows remaining" % 
-                            (len(raw_data) - i, total_rows)
-                    )
-                    processblock = raw_data[i : (i + blocksize)]
-                    task_normalize_block(processblock)
-                    i += blocksize
-        except Exception as err:
-            logger.error("Failed to normalize affil_data table: %s" % err)
-        else:
-            logger.info("affil_data has been normalized in affil_norm")
 
 def task_find_discrepant(data):
     if data:            
@@ -148,10 +121,29 @@ def task_find_discrepant(data):
                 if len(v) == 1:
                     verified.append({"affil_id": v.get("affil_id"), "norm_string": v.get("norm_string")})
                 else:
-                    discrepant.extend([p for p in v])
+                    discrepant.extend(v)
             if discrepant:
                 logger.info("There are %s discrepant pairs" % len(discrepant))
             if verified:
                 task_write_to_database(affil_norm, verified)
         except Exception as err:
             print("well that's just great: %s" % err)
+
+
+def task_normalize_all():
+    try:
+        db.clear_table(app, affil_curation)
+    except Exception as err:
+        logger.error("Failed to clear affil_norm table: %s" % err)
+    else:
+        logger.debug("Affil_norm table has been cleared.")
+        try:
+            raw_data = db.fetch_data_table(app, affil_data)
+            logger.debug("Affil_data table has been fetched.")
+            if raw_data:
+                task_find_discrepant(raw_data)
+        except Exception as err:
+            logger.error("Failed to normalize affil_data table: %s" % err)
+        else:
+            logger.info("affil_data has been normalized in affil_norm")
+
