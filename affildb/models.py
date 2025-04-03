@@ -53,9 +53,10 @@ class AffilData(Base):
     updated = Column(UTCDateTime, onupdate=get_date)
 
     def toRow(rowdat):
-        if len(rowdat) == 2:
+        if len(rowdat) == 3:
             return {"affil_id": rowdat[0],
-                    "affil_string": rowdat[1]}
+                    "affil_string": rowdat[1]
+                    "norm_string": rowdat[2]}
         else:
             return {}
 
