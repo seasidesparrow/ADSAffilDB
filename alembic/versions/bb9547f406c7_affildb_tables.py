@@ -54,7 +54,7 @@ def upgrade() -> None:
             nullable=False),
         sa.Column("data_key", sa.Integer(), nullable=False),
         sa.Column("affil_id", sa.String(), nullable=False),
-        sa.Column("affil_string", sa.String(), nullable=False)
+        sa.Column("affil_string", sa.String(), nullable=False),
         sa.Column("norm_string", sa.String(), nullable=False),
         sa.Column("notes", sa.String(), nullable=False, default=""),
         sa.Column("created", UTCDateTime, nullable=True, default=get_date),
