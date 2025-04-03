@@ -45,8 +45,9 @@ class AffilData(Base):
     __tablename__ = "affil_data"
 
     data_key = Column(Integer, primary_key=True, unique=True)
-    affil_id = Column(String(6), nullable=False)
+    affil_id = Column(String(6), primary_key=True, unique=False, nullable=False)
     affil_string = Column(Text, unique=True, nullable=False)
+    norm_string = Column(Text, primary_key=True, unique=False, nullable=False)
     flagged = Column(Boolean, nullable=True)
     created = Column(UTCDateTime, default=get_date)
     updated = Column(UTCDateTime, onupdate=get_date)

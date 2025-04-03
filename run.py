@@ -76,6 +76,9 @@ def main():
         dataMatchedAffils = utils.read_flat_files(infile,
                                                   with_header,
                                                   delimiter)
+        foo = dataMatchedAffils[0:10]
+        print(foo, type(foo))
+        quit()
         tasks.task_write_to_database(affil_data, dataMatchedAffils)
 
     if args.normalize:
