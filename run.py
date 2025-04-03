@@ -5,7 +5,6 @@ from adsputils import load_config, setup_logging
 
 from affildb.models import AffilInst as affil_inst
 from affildb.models import AffilData as affil_data
-from affildb.models import AffilNorm as affil_norm
 
 proj_home = os.path.realpath(os.path.join(os.path.dirname(__file__), "./"))
 config = load_config(proj_home=proj_home)
