@@ -80,7 +80,7 @@ def main():
         # each column is an element of the inner list
         dataNormAffils = []
         for row in dataMatchedAffils:
-            affil_id
+            affil_id = row[0]
             affil_string = row[1]
             dataNormAffils.append(
                 affil_id,
