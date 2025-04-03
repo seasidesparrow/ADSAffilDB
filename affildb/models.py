@@ -13,7 +13,7 @@ class AffilInst(Base):
     __tablename__ = "affil_inst"
 
     inst_key = Column(Integer, primary_key=True, unique=True)
-    inst_id = Column(String(6), unique=True, nullable=False)
+    inst_id = Column(String(6), primary_key=True, unique=True, nullable=False)
     inst_parents = Column(String, nullable=True)
     inst_canonical = Column(String, nullable=False)
     inst_abbreviation = Column(String, nullable=False)
