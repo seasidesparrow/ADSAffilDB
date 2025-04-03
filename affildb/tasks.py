@@ -26,8 +26,8 @@ logger = app.logger
 
 app.conf.CELERY_QUEUES = (
     Queue("augment", app.exchange, routing_key="augment"),
-    Queue("normalize", app.exchange, routing_key="normalize"),
-    Queue("write-db", app.exchange, routing_key="write-db"),
+    #Queue("normalize", app.exchange, routing_key="normalize"),
+    #Queue("write-db", app.exchange, routing_key="write-db"),
 )
 
 # pipeline query tasks
@@ -59,7 +59,7 @@ def task_query_one_affil(input_string, normalize=True):
 
 
 # data management tasks
-@app.task(queue="write-db")
+#@app.task(queue="write-db")
 def task_write_block(table, datablock):
     try:
         db.write_block_to_table(app, table, datablock)
@@ -145,3 +145,10 @@ def task_normalize_all():
         else:
             logger.info("affil_data has been normalized in affil_norm")
 
+
+def task_unique_norm():
+    try:
+        result = db.query_distinct_norm(app, affil_data)
+        print("lol len(result) = %s" % len(result))
+    except Exception as err:
+        logger.error("Well great. %s" % err)

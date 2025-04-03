@@ -66,3 +66,9 @@ def fetch_data_table(app, table):
             raise DBQueryException("Unable to query %s for %s: %s" % (str(table), query_string, err))
 
 
+def query_distinct_norm(app, table):
+    with app.session_scope() as session:
+        try:
+            return session.query(affil_data).join(affil_data.norm_string).distinct().all()
+        except Exception as err:
+            raise DBQueryException("Unable to query %s for distinct normalized strings: %s" % (str(table), err))

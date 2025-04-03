@@ -116,6 +116,8 @@ def main():
             for d in discrepant:
                 print(d)
 
+    tasks.task_unique_norm()
+
 
 if __name__ == '__main__':
     main()
