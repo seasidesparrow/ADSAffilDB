@@ -12,7 +12,7 @@ Base = declarative_base()
 class AffilInst(Base):
     __tablename__ = "affil_inst"
 
-    inst_key = Column(Integer, primary_key=True, unique=True)
+    inst_key = Column(Integer, primary_key=True, autoincrement=True, unique=True)
     inst_id = Column(String(6), primary_key=True, unique=True, nullable=False)
     inst_parents = Column(String, nullable=True)
     inst_canonical = Column(String, nullable=False)
@@ -44,7 +44,7 @@ class AffilData(Base):
 
     __tablename__ = "affil_data"
 
-    data_key = Column(Integer, primary_key=True, unique=True)
+    data_key = Column(Integer, primary_key=True, autoincrement=True, unique=True)
     affil_id = Column(String(6), primary_key=True, unique=False, nullable=False)
     affil_string = Column(Text, unique=True, nullable=False)
     norm_string = Column(Text, primary_key=True, unique=False, nullable=False)
