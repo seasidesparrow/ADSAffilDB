@@ -76,10 +76,19 @@ def main():
         dataMatchedAffils = utils.read_flat_files(infile,
                                                   with_header,
                                                   delimiter)
-        foo = dataMatchedAffils[0:10]
-        print(foo, type(foo))
-        quit()
-        tasks.task_write_to_database(affil_data, dataMatchedAffils)
+        # utils.read_flat_files returns a list of lists of string, where
+        # each column is an element of the inner list
+        dataNormAffils = []
+        for row in dataMatchedAffils:
+            affil_string = row[1]
+            dataNormAffils.append(
+                normalize.normalize_string(
+                    affil_string,
+                    kill_spaces = config.get("NORM_KILL_SPACES", False),
+                    upper_case = config.get("NORM_UPPER_CASE", False)
+                )
+            )
+        tasks.task_write_to_database(affil_data, dataNormAffils)
 
     if args.normalize:
         tasks.task_normalize_all()
