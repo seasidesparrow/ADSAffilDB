@@ -89,7 +89,7 @@ def main():
                     affil_string,
                     kill_spaces = config.get("NORM_KILL_SPACES", False),
                     upper_case = config.get("NORM_UPPER_CASE", False)
-                ])
+                )]
             )
         tasks.task_write_to_database(affil_data, dataNormAffils)
 
