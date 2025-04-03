@@ -80,8 +80,11 @@ def main():
         # each column is an element of the inner list
         dataNormAffils = []
         for row in dataMatchedAffils:
+            affil_id
             affil_string = row[1]
             dataNormAffils.append(
+                affil_id,
+                affil_string,
                 normalize.normalize_string(
                     affil_string,
                     kill_spaces = config.get("NORM_KILL_SPACES", False),
