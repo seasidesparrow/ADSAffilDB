@@ -62,25 +62,3 @@ class AffilData(Base):
 
 
 
-class AffilCuration(Base):
-    __tablename__ = "affil_curation"
-
-    curation_key = Column(Integer, primary_key=True, autoincrement=True, unique=True)
-    data_key = Column(Integer, primary_key=True, unique=True, nullable=False)
-    affil_id = Column(Text, primary_key=True, unique=False, nullable=False)
-    affil_string = Column(Text, unique=True, nullable=False)
-    norm_string = Column(Text, primary_key=True, nullable=False)
-    notes = Column(Text, unique=False, nullable=False, default="")
-    created = Column(UTCDateTime, default=get_date)
-
-    def toRow(rowdat):
-        if len(rowdat) == 5:
-            return {
-                    "data_key": rowdat[0],
-                    "affil_id": rowdat[1],
-                    "affil_string": rowdat[2],
-                    "norm_string": rowdat[3],
-                    "notes": rowdat[4],
-                   }
-        else:
-            return {}

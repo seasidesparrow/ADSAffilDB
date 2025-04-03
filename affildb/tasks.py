@@ -7,8 +7,8 @@ from sqlalchemy import func
 
 from affildb import app as app_module
 from affildb import normalize, utils
+from affildb.models import AffilInst as affil_inst
 from affildb.models import AffilData as affil_data
-from affildb.models import AffilCuration as affil_curation
 
 import affildb.database as db
 
@@ -26,8 +26,6 @@ logger = app.logger
 
 app.conf.CELERY_QUEUES = (
     Queue("augment", app.exchange, routing_key="augment"),
-    #Queue("normalize", app.exchange, routing_key="normalize"),
-    #Queue("write-db", app.exchange, routing_key="write-db"),
 )
 
 # pipeline query tasks
@@ -85,7 +83,6 @@ def task_write_to_database(table_def, data):
         logger.error("Failed to write data to %s: %s" % (table_def, err))
 
 
-#@app.task(queue="normalize")
 #def task_normalize_block(data):
 #    try:
 #        norm_data = []
