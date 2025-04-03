@@ -13,7 +13,7 @@ from affildb.models import AffilData as affil_data
 import affildb.database as db
 
 name_to_table = {"AffilData": affil_data,
-                 "AffilCuration": affil_curation}
+                }
 
 proj_home = os.path.realpath(os.path.join(os.path.dirname(__file__), "../"))
 app = app_module.ADSAffilDBCelery(
