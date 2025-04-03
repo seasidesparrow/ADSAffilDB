@@ -82,14 +82,14 @@ def main():
         for row in dataMatchedAffils:
             affil_id = row[0]
             affil_string = row[1]
-            dataNormAffils.append(
+            dataNormAffils.append([
                 affil_id,
                 affil_string,
                 normalize.normalize_string(
                     affil_string,
                     kill_spaces = config.get("NORM_KILL_SPACES", False),
                     upper_case = config.get("NORM_UPPER_CASE", False)
-                )
+                ])
             )
         tasks.task_write_to_database(affil_data, dataNormAffils)
 

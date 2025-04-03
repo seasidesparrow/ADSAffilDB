@@ -1,4 +1,4 @@
-LOGGING_LEVEL="DEBUG"
+LOGGING_LEVEL="INFO"
 LOG_STDOUT=True
 
 COUNTRY_PARENT_CHILD_FILE = "/proj/ads_abstracts/config/affils/PIPELINE/data/country_parent_child.tsv"
