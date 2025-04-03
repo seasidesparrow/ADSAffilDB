@@ -48,9 +48,9 @@ class AffilData(Base):
     affil_id = Column(String(6), primary_key=True, unique=False, nullable=False)
     affil_string = Column(Text, unique=True, nullable=False)
     norm_string = Column(Text, primary_key=True, unique=False, nullable=False)
-    flagged = Column(Boolean, nullable=True)
-    created = Column(UTCDateTime, default=get_date)
-    updated = Column(UTCDateTime, onupdate=get_date)
+    flagged = Column(Boolean, default=False, nullable=False)
+    created = Column(UTCDateTime, default=get_date, nullable=False)
+    updated = Column(UTCDateTime, onupdate=get_date, nullable=False)
 
     def toRow(rowdat):
         if len(rowdat) == 3:
@@ -61,35 +61,26 @@ class AffilData(Base):
             return {}
 
 
-class AffilNorm(Base):
-    __tablename__ = "affil_match"
-
-    norm_key = Column(Integer, primary_key=True, unique=True)
-    affil_id = Column(String(6), unique=False, nullable=False)
-    norm_string = Column(Text, unique=True, nullable=False)
-    created = Column(UTCDateTime, default=get_date)
-
-    def toRow(rowdat):
-        if len(rowdat) == 2:
-            return {"affil_id": rowdat[0],
-                    "norm_string": rowdat[1]}
-        else:
-            return {}
-
-
 
 class AffilCuration(Base):
     __tablename__ = "affil_curation"
 
-    curation_key = Column(Integer, primary_key=True, unique=True)
-    affil_id = Column(Text, unique=False, nullable=True)
-    norm_string = Column(Text, nullable=False)
-    notes = Column(Text, unique=False, nullable=False)
+    curation_key = Column(Integer, primary_key=True, autoincrement=True, unique=True)
+    data_key = Column(Integer, primary_key=True, unique=True, nullable=False)
+    affil_id = Column(Text, primary_key=True, unique=False, nullable=False)
+    affil_string = Column(Text, unique=True, nullable=False)
+    norm_string = Column(Text, primary_key=True, nullable=False)
+    notes = Column(Text, unique=False, nullable=False, default="")
     created = Column(UTCDateTime, default=get_date)
 
     def toRow(rowdat):
-        if len(rowdat) == 2:
-            return {"affil_id": rowdat[0],
-                    "norm_string": rowdat[1]}
+        if len(rowdat) == 5:
+            return {
+                    "data_key": rowdat[0],
+                    "affil_id": rowdat[1],
+                    "affil_string": rowdat[2],
+                    "norm_string": rowdat[3],
+                    "notes": rowdat[4],
+                   }
         else:
             return {}
