@@ -8,13 +8,11 @@ from sqlalchemy import func
 from affildb import app as app_module
 from affildb import normalize, utils
 from affildb.models import AffilData as affil_data
-from affildb.models import AffilNorm as affil_norm
 from affildb.models import AffilCuration as affil_curation
 
 import affildb.database as db
 
 name_to_table = {"AffilData": affil_data,
-                 "AffilNorm": affil_norm, 
                  "AffilCuration": affil_curation}
 
 proj_home = os.path.realpath(os.path.join(os.path.dirname(__file__), "../"))
@@ -87,47 +85,47 @@ def task_write_to_database(table_def, data):
         logger.error("Failed to write data to %s: %s" % (table_def, err))
 
 
-@app.task(queue="normalize")
-def task_normalize_block(data):
-    try:
-        norm_data = []
-        for row in data:
-            [affil_id, affil_string] = row
-            normstring = normalize.normalize_string(affil_string, kill_spaces=app.conf.get("NORM_KILL_SPACES", False), upper_case=app.conf.get("NORM_UPPER_CASE", False))
-            nd = affil_curation.toRow([affil_id, normstring])
-            norm_data.append(nd)
-        if norm_data:
-            task_write_block(affil_norm, norm_data)
-        else:
-            logger.warning("Normalize.normalize_block returned no data!")
-    except Exception as err:
-        logger.error("Normalize block failed! %s" % err)
+#@app.task(queue="normalize")
+#def task_normalize_block(data):
+#    try:
+#        norm_data = []
+#        for row in data:
+#            [affil_id, affil_string] = row
+#            normstring = normalize.normalize_string(affil_string, kill_spaces=app.conf.get("NORM_KILL_SPACES", False), upper_case=app.conf.get("NORM_UPPER_CASE", False))
+#            nd = affil_curation.toRow([affil_id, normstring])
+#            norm_data.append(nd)
+#        if norm_data:
+#            task_write_block(affil_norm, norm_data)
+#        else:
+#            logger.warning("Normalize.normalize_block returned no data!")
+#    except Exception as err:
+#        logger.error("Normalize block failed! %s" % err)
 
 
-def task_find_discrepant(data):
-    if data:            
-        try:            
-            globalDict = {}
-            discrepant = []
-            verified = []
-            for affid, affstring in data:
-                affnorm = normalize.normalize_string(affstring, kill_spaces=app.conf.get("NORM_KILL_SPACES", False), upper_case=app.conf.get("NORM_UPPER_CASE", False))
-                affdict = {"affil_id": affid, "affil_string": affstring, "norm_string": affnorm}
-                if not globalDict.get(affnorm, None):
-                    globalDict[affnorm] = [affdict]
-                else:
-                    globalDict[affnorm].append(affdict)
-            for k, v in globalDict.items():
-                if len(v) == 1:
-                    verified.append({"affil_id": v.get("affil_id"), "norm_string": v.get("norm_string")})
-                else:
-                    discrepant.extend(v)
-            if discrepant:
-                logger.info("There are %s discrepant pairs" % len(discrepant))
-            if verified:
-                task_write_to_database(affil_norm, verified)
-        except Exception as err:
-            print("well that's just great: %s" % err)
+#def task_find_discrepant(data):
+#    if data:            
+#        try:            
+#            globalDict = {}
+#            discrepant = []
+#            verified = []
+#            for affid, affstring in data:
+#                affnorm = normalize.normalize_string(affstring, kill_spaces=app.conf.get("NORM_KILL_SPACES", False), upper_case=app.conf.get("NORM_UPPER_CASE", False))
+#                affdict = {"affil_id": affid, "affil_string": affstring, "norm_string": affnorm}
+#                if not globalDict.get(affnorm, None):
+#                    globalDict[affnorm] = [affdict]
+#                else:
+#                    globalDict[affnorm].append(affdict)
+#            for k, v in globalDict.items():
+#                if len(v) == 1:
+#                    verified.append({"affil_id": v.get("affil_id"), "norm_string": v.get("norm_string")})
+#                else:
+#                    discrepant.extend(v)
+#            if discrepant:
+#                logger.info("There are %s discrepant pairs" % len(discrepant))
+#            if verified:
+#                task_write_to_database(affil_norm, verified)
+#        except Exception as err:
+#            print("well that's just great: %s" % err)
 
 
 def task_normalize_all():

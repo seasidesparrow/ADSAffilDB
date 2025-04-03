@@ -7,5 +7,5 @@ EXISTING_ID_FILE = "/proj/ads_abstracts/config/affils/PIPELINE/data/affil_string
 NORM_KILL_SPACES = True
 NORM_UPPER_CASE = True
 
-NORMALIZED_DATA_TABLE = "AffilNorm"
+NORMALIZED_DATA_TABLE = "AffilData"
 RAW_DATA_TABLE = "AffilData"
