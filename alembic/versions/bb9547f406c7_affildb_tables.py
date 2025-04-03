@@ -58,8 +58,8 @@ def upgrade() -> None:
         sa.Column("norm_string", sa.String(), nullable=False),
         sa.Column("notes", sa.String(), nullable=False, default=""),
         sa.Column("created", UTCDateTime, nullable=True, default=get_date),
-        sa.PrimaryKeyConstraint("curation_key", "data_key", name="dpairs"),
-        sa.PrimaryKeyConstraint("norm_string", "affil_id", name="npairs"),
+        sa.PrimaryKeyConstraint("curation_key", "data_key", "affil_id", "norm_string", name="dpairs"),
+        #sa.PrimaryKeyConstraint("norm_string", "affil_id", name="npairs"),
     )
 
 
