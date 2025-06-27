@@ -31,7 +31,7 @@ def get_args():
 
     parser.add_argument("-n",
                         "--norm",
-                        dest="normalize",
+                        dest="norm",
                         action="store_true",
                         default=False,
                         help="Generate normalized version of affil_data")
@@ -101,7 +101,7 @@ def main():
             )
         tasks.task_write_to_database(affil_data, dataNormAffils)
 
-    if args.normalize:
+    if args.norm:
         tasks.task_normalize_all()
 
     if args.sanity:

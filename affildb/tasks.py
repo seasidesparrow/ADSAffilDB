@@ -30,12 +30,12 @@ app.conf.CELERY_QUEUES = (
 
 # pipeline query tasks
 @app.task(queue="augment")
-def task_query_one_affil(input_string, normalize=True):
+def task_query_one_affil(input_string, norm=True):
     try:
         query_string = None
         table = None
         if input_string:
-            if normalize:
+            if norm:
                 query_string = normalize.normalize_string(
                     input_string,
                     kill_spaces = app.conf.get("NORM_KILL_SPACES", False),
