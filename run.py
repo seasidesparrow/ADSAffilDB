@@ -51,13 +51,23 @@ def get_args():
                         default=False,
                         help="Look for normalized strings pointing to multiple affids.")
 
+    parser.add_argument("-d",
+                        "--debug",
+                        dest="debug",
+                        action="store_true",
+                        default=False,
+                        help="Run the debug string 'Bartol / University of Delaware' through pipeline")
     return parser.parse_args()
 
 def main():
 
     args = get_args()
 
-    if args.load_pc: 
+    if args.debug:
+        testString = "Bartol / University of Delaware"
+        tasks.task_query_one_affil(testString)
+
+    elif args.load_pc: 
         infile = config.get("COUNTRY_PARENT_CHILD_FILE", "./data/cpc.tsv")
         with_header = True
         delimiter = "\t"
@@ -66,7 +76,6 @@ def main():
                                                 delimiter)
         uniqueParentChild = utils.merge_parents(dataParentChild)
         tasks.task_write_to_database(affil_inst, uniqueParentChild)
-        
 
     if args.load_affs:
         infile = config.get("EXISTING_ID_FILE", "./data/Affils.tsv")
