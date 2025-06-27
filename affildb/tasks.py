@@ -50,7 +50,7 @@ def task_query_one_affil(input_string, norm=True):
             #query and generate facets (if matched)
             # YOU NEED TO REWRITE THE db.query TO RETURN THE FACET DATA
             # NOT JUST THE inst_id
-            return db.query_one_string(app, table, query_string)
+            return db.query_one_string(app, table, query_string, norm)
         else:
             return
     except Exception as err:

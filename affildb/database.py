@@ -46,11 +46,15 @@ def write_block_to_table(app, table, datablock):
             session.flush()
             raise DBWriteException("Failed to bulk write data block: %s" % err)
 
-def query_one_string(app, table, query_string):
+def query_one_string(app, table, query_string, norm):
     with app.session_scope() as session:
         outputDefault = ("-", "-", None, "-")
         try:
-            inst_id = session.query(table.affil_id).filter_by(affil_string=query_string).all()
+            inst_id = None
+            if norm:
+                inst_id = session.query(table.affil_id).filter_by(norm_string=query_string).first()[0]
+            else:
+                inst_id = session.query(table.affil_id).filter_by(affil_string=query_string).first()[0]
 
             if not inst_id:
                 return outputDefault
