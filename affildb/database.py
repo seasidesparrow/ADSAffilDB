@@ -48,8 +48,16 @@ def write_block_to_table(app, table, datablock):
 
 def query_one_string(app, table, query_string):
     with app.session_scope() as session:
+        outputDefault = ("-", "-", None, "-")
         try:
-            return session.query(table.affil_id).filter_by(affil_string=query_string).all()
+            inst_id = session.query(table.affil_id).filter_by(affil_string=query_string).all()
+
+            if not inst_id:
+                return outputDefault
+
+            else:
+                print("inst_id: %s" % inst_id)
+                
         except Exception as err:
             raise DBQueryException("Unable to query %s for %s: %s" % (str(table), query_string, err))
 

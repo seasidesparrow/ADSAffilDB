@@ -47,7 +47,9 @@ def task_query_one_affil(input_string, normalize=True):
                 table_name = app.conf.get("RAW_DATA_TABLE", None)
             if table_name:
                 table = name_to_table.get(table_name, None)
-        if query_string and table:
+            #query and generate facets (if matched)
+            # YOU NEED TO REWRITE THE db.query TO RETURN THE FACET DATA
+            # NOT JUST THE inst_id
             return db.query_one_string(app, table, query_string)
         else:
             return
