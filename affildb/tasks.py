@@ -33,7 +33,6 @@ app.conf.CELERY_QUEUES = (
 def task_query_one_affil(input_string, norm=True):
     try:
         query_string = None
-        table = None
         if input_string:
             if norm:
                 query_string = normalize.normalize_string(
@@ -41,16 +40,12 @@ def task_query_one_affil(input_string, norm=True):
                     kill_spaces = app.conf.get("NORM_KILL_SPACES", False),
                     upper_case = app.conf.get("NORM_UPPER_CASE", False)
                 )
-                table_name = app.conf.get("NORMALIZED_DATA_TABLE", None)
             else:
                 query_string = input_string
-                table_name = app.conf.get("RAW_DATA_TABLE", None)
-            if table_name:
-                table = name_to_table.get(table_name, None)
             #query and generate facets (if matched)
             # YOU NEED TO REWRITE THE db.query TO RETURN THE FACET DATA
             # NOT JUST THE inst_id
-            return db.query_one_string(app, table, query_string, norm)
+            return db.query_one_string(app, affil_data, affil_inst, query_string, norm)
         else:
             return
     except Exception as err:
@@ -101,9 +96,10 @@ def task_write_to_database(table_def, data):
 #        logger.error("Normalize block failed! %s" % err)
 
 
+
 #def task_find_discrepant(data):
-#    if data:            
-#        try:            
+#    if data:
+#        try:
 #            globalDict = {}
 #            discrepant = []
 #            verified = []
@@ -125,7 +121,6 @@ def task_write_to_database(table_def, data):
 #                task_write_to_database(affil_norm, verified)
 #        except Exception as err:
 #            print("well that's just great: %s" % err)
-
 
 def task_normalize_all():
     try:

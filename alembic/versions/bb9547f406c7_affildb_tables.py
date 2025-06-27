@@ -30,6 +30,7 @@ def upgrade() -> None:
         sa.Column("inst_rorid", sa.String(), nullable=True),
         sa.Column("inst_notes", sa.Text(), nullable=True),
         sa.Column("created", UTCDateTime, nullable=True, default=get_date),
+        sa.Column("updated", UTCDateTime, nullable=True, onupdate=get_date),
         sa.PrimaryKeyConstraint("inst_key"),
         sa.UniqueConstraint("inst_id"),
     )

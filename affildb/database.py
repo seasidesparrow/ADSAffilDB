@@ -25,7 +25,7 @@ class DBWriteException(Exception):
 class DBQueryException(Exception):
     pass
 
-# general use functions, 
+# general use functions,
 def clear_table(app, table):
     with app.session_scope() as session:
         try:
@@ -46,24 +46,24 @@ def write_block_to_table(app, table, datablock):
             session.flush()
             raise DBWriteException("Failed to bulk write data block: %s" % err)
 
-def query_one_string(app, table, query_string, norm):
+def query_one_string(app, data_table, id_table, query_string, norm):
     with app.session_scope() as session:
         outputDefault = ("-", "-", None, "-")
         try:
             inst_id = None
             if norm:
-                inst_id = session.query(table.affil_id).filter_by(norm_string=query_string).first()[0]
+                inst_id = session.query(id_table).join(data_table, data_table.affil_id == id_table.inst_id).filter(data_table.norm_string==query_string).first()
             else:
-                inst_id = session.query(table.affil_id).filter_by(affil_string=query_string).first()[0]
+                inst_id = session.query(id_table).join(data_table, data_table.affil_id == id_table.inst_id).filter(data_table.affil_string==query_string).first()
 
             if not inst_id:
                 return outputDefault
 
             else:
-                print("inst_id: %s" % inst_id)
-                
+                print("inst_id: %s" % inst_id.toJSON())
+
         except Exception as err:
-            raise DBQueryException("Unable to query %s for %s: %s" % (str(table), query_string, err))
+            raise DBQueryException("Unable to query %s for %s: %s" % (str(data_table), query_string, err))
 
 
 def fetch_data_table(app, table):

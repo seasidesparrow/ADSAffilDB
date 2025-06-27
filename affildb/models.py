@@ -26,17 +26,19 @@ class AffilInst(Base):
     created = Column(UTCDateTime, default=get_date)
     updated = Column(UTCDateTime, onupdate=get_date)
 
-    def toRow(rowdat):
-        if len(rowdat) == 5:
-            return {"inst_country": rowdat[0],
-                    "inst_parents": rowdat[1],
-                    "inst_id": rowdat[2],
-                    "inst_abbreviation": rowdat[3],
-                    "inst_canonical": rowdat[4]}
-        else:
-            return {}
-
-
+    def toJSON(self):
+        try:
+            outputJson = {"inst_country": self.inst_country,
+                          "inst_parents": self.inst_parents,
+                          "inst_id": self.inst_id,
+                          "inst_abbreviation": self.inst_abbreviation,
+                          "inst_canonical": self.inst_canonical,
+                          "error": ""}
+            return outputJson
+        except Exception as err:
+            return {"error": err}
+                
+        
 class AffilData(Base):
     """
     affil_data holds the mapping of published string and affiliation ID
@@ -52,13 +54,12 @@ class AffilData(Base):
     created = Column(UTCDateTime, default=get_date, nullable=False)
     updated = Column(UTCDateTime, onupdate=get_date, nullable=False)
 
-    def toRow(rowdat):
-        if len(rowdat) == 3:
-            return {"affil_id": rowdat[0],
-                    "affil_string": rowdat[1],
-                    "norm_string": rowdat[2]}
-        else:
-            return {}
-
-
-
+    def toJSON(self):
+        try:
+            outputJson = {"affil_id": self.affil_id,
+                          "affil_string": self.affil_string,
+                          "norm_string": self.norm_string,
+                          "error": ""}
+            return outputJson
+        except Exception as err:
+            return {"error": err}

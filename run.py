@@ -67,7 +67,7 @@ def main():
         testString = "Bartol / University of Delaware"
         tasks.task_query_one_affil(testString)
 
-    elif args.load_pc: 
+    elif args.load_pc:
         infile = config.get("COUNTRY_PARENT_CHILD_FILE", "./data/cpc.tsv")
         with_header = True
         delimiter = "\t"
