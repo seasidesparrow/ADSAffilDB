@@ -3,6 +3,9 @@ import os
 from adsputils import load_config, setup_logging
 from sqlalchemy import func, insert
 
+from affildb.models import AffilInst as affil_inst
+from affildb.models import AffilData as affil_data
+from affildb.faceter import AffilFaceter as af
 
 proj_home = os.path.realpath(os.path.join(os.path.dirname(__file__), "../"))
 config = load_config(proj_home=proj_home)
@@ -46,24 +49,56 @@ def write_block_to_table(app, table, datablock):
             session.flush()
             raise DBWriteException("Failed to bulk write data block: %s" % err)
 
-def query_one_string(app, data_table, id_table, query_string, norm):
+def query_one_string(app, query_string, norm):
     with app.session_scope() as session:
-        outputDefault = ("-", "-", None, "-")
+        outputDefault = {}
         try:
             inst_id = None
             if norm:
-                inst_id = session.query(id_table).join(data_table, data_table.affil_id == id_table.inst_id).filter(data_table.norm_string==query_string).first()
+                inst_id = session.query(affil_inst).join(affil_data, affil_data.affil_id == affil_inst.inst_id).filter(affil_data.norm_string==query_string).first()
             else:
-                inst_id = session.query(id_table).join(data_table, data_table.affil_id == id_table.inst_id).filter(data_table.affil_string==query_string).first()
+                inst_id = session.query(affil_inst).join(affil_data, affil_data.affil_id == affil_inst.inst_id).filter(affil_data.affil_string==query_string).first()
 
             if not inst_id:
                 return outputDefault
 
             else:
-                print("inst_id: %s" % inst_id.toJSON())
+                child_data = inst_id.toJSON()
+                parent_str = child_data.get("inst_parents", "")
+                parent_data = []
+                if parent_str:
+                    parent_id_list = [x.strip() for x in parent_str.split(";")]
+                    for p in parent_id_list:
+                        try:
+                            pdata = session.query(affil_inst).filter(affil_inst.inst_id==p).first().toJSON()
+                            parent_data.append(pdata)
+                        except Exception as err:
+                            print("This shouldn't happen: %s" % err)
+                child_data["parent_data"] = parent_data
+                return child_data
 
         except Exception as err:
-            raise DBQueryException("Unable to query %s for %s: %s" % (str(data_table), query_string, err))
+            raise DBQueryException("Unable to query %s for %s: %s" % (str(affil_data), query_string, err))
+
+
+def augment_record(app, record, norm):
+    try:
+        author_data = []
+        for auth in record.get("aff", []):
+            alist = auth.split(";")
+            author_aff = []
+            for a in alist:
+                author_aff.append(query_one_string(app, record, norm))
+            author_data.append(author_aff)
+        augment_affil = af().parse(author_data)
+        return augment_affil
+    except Exception as err:
+        print("Welp... %s" % err)
+        
+
+# output is...
+#{'inst_country': 'USA', 'inst_parents': 'A00976', 'inst_id': 'A00977', 'inst_abbreviation': 'Bartol Res Inst', 'inst_canonical': 'University of Delaware, Bartol Research Institute', 'error': '', 'parent_data': [{'inst_country': 'USA', 'inst_parents': '', 'inst_id': 'A00976', 'inst_abbreviation': 'U Delaware', 'inst_canonical': 'University of Delaware', 'error': ''}]}
+            
 
 
 def fetch_data_table(app, table):

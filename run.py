@@ -1,4 +1,5 @@
 import argparse
+import json
 import os
 from affildb import utils, normalize, tasks
 from adsputils import load_config, setup_logging
@@ -57,6 +58,14 @@ def get_args():
                         action="store_true",
                         default=False,
                         help="Run the debug string 'Bartol / University of Delaware' through pipeline")
+
+    parser.add_argument("-t",
+                        "--test",
+                        dest="test",
+                        action="store_true",
+                        default=False,
+                        help="Run the test record bib data through pipeline (2025ApJ...978..126Z)")
+
     return parser.parse_args()
 
 def main():
@@ -66,6 +75,14 @@ def main():
     if args.debug:
         testString = "Bartol / University of Delaware"
         tasks.task_query_one_affil(testString)
+
+    elif args.test:
+        try:
+            with open("./tests/stubdata/2025ApJ...978..126Z.json") as fi:
+                records = [json.load(fi)]
+            tasks.task_augment_record_bundle(records)
+        except Exception as err:
+            print("failed: %s" % err)
 
     elif args.load_pc:
         infile = config.get("COUNTRY_PARENT_CHILD_FILE", "./data/cpc.tsv")

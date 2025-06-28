@@ -12,9 +12,6 @@ from affildb.models import AffilData as affil_data
 
 import affildb.database as db
 
-name_to_table = {"AffilData": affil_data,
-                }
-
 proj_home = os.path.realpath(os.path.join(os.path.dirname(__file__), "../"))
 app = app_module.ADSAffilDBCelery(
     "affildb-pipeline",
@@ -30,7 +27,28 @@ app.conf.CELERY_QUEUES = (
 
 # pipeline query tasks
 @app.task(queue="augment")
-def task_query_one_affil(input_string, norm=True):
+def task_augment_record_bundle(records):
+    augments = []
+    for rec in records:
+        bibcode = rec.get("bibcode", "")
+        scixID = rec.get("scix_id", "SciX:0000-abcd-9876")
+        author = rec.get("author", [])
+        aff = rec.get("aff", [])
+        augment = {"bibcode": bibcode,
+                   "scix_id": scixID,
+                   "author": author,
+                   "aff": aff}
+        augmented = db.augment_record(app, augment, norm=True)
+        augments.append(augmented)
+    with open("../output.json", "w") as fj:
+        fj.write("%s\n" % json.dumps(augments, indent=2, sort_keys=True))
+
+
+
+
+
+
+def task_process_one_affil(input_string, norm=True):
     try:
         query_string = None
         if input_string:
@@ -43,14 +61,10 @@ def task_query_one_affil(input_string, norm=True):
             else:
                 query_string = input_string
             #query and generate facets (if matched)
-            # YOU NEED TO REWRITE THE db.query TO RETURN THE FACET DATA
-            # NOT JUST THE inst_id
-            return db.query_one_string(app, affil_data, affil_inst, query_string, norm)
-        else:
-            return
+            result = db.query_one_string(app, affil_data, affil_inst, query_string, norm)
+            logger.info("Result for \"%s\": %s" % (input_string, result))
     except Exception as err:
         logger.error("Query failed for '%s': %s" % (str(input_string),err))
-        return
 
 
 # data management tasks
