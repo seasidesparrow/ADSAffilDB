@@ -7,8 +7,7 @@ from sqlalchemy import func
 
 from affildb import app as app_module
 from affildb import normalize, utils
-from affildb.models import AffilInst as affil_inst
-from affildb.models import AffilData as affil_data
+from affildb.faceter import AffilFaceter as af
 
 import affildb.database as db
 
@@ -25,9 +24,35 @@ app.conf.CELERY_QUEUES = (
     Queue("augment", app.exchange, routing_key="augment"),
 )
 
-# pipeline query tasks
+def augment_record(app, record, norm):
+    try:
+        author_data = []
+        affils = record.get("aff", [])
+        for auth in affils:
+            auth = html.unescape(auth)
+            alist = auth.split(";")
+            author_aff = []
+            for a in alist:
+                if norm:
+                    query_string = normalize.normalize_string(a,
+                        kill_spaces = app.conf.get("NORM_KILL_SPACES", False),
+                        upper_case = app.conf.get("NORM_UPPER_CASE", False)
+                    )
+                else:
+                    query_string = normalize.clean_string(a)
+
+                res = db.query_one_string(app, query_string, norm)
+                author_aff.append(res)
+            author_data.append(author_aff)
+        augment_affil = af().parse(record, author_data)
+        return augment_affil
+    except Exception as err:
+        # print("Welp... %s" % err)
+        pass
+
+# pipeline tasks
 @app.task(queue="augment")
-def task_augment_record_bundle(records):
+def task_augment_record_bundle(records, norm=True):
     augments = []
     for rec in records:
         bibcode = rec.get("bibcode", "")
@@ -38,16 +63,14 @@ def task_augment_record_bundle(records):
                    "scix_id": scixID,
                    "author": author,
                    "aff": aff}
-        augmented = db.augment_record(app, augment, norm=True)
+        augmented = augment_record(app, augment, norm)
         augments.append(augmented)
-    with open("../output.json", "w") as fj:
-        fj.write("%s\n" % json.dumps(augments, indent=2, sort_keys=True))
+    # at this point, augments should contain the augment column for
+    # all of the records in the bundle.  This would get sent to
+    # honeycomb as a data piece for the bibcode/scixid/recordid
 
 
-
-
-
-
+# only used for testing, can be deleted
 def task_process_one_affil(input_string, norm=True):
     try:
         query_string = None
@@ -61,10 +84,10 @@ def task_process_one_affil(input_string, norm=True):
             else:
                 query_string = input_string
             #query and generate facets (if matched)
-            result = db.query_one_string(app, affil_data, affil_inst, query_string, norm)
+            result = db.query_one_string(app, query_string, norm)
             logger.info("Result for \"%s\": %s" % (input_string, result))
     except Exception as err:
-        logger.error("Query failed for '%s': %s" % (str(input_string),err))
+        logger.error("Query failed for '%s': %s" % (input_string, err))
 
 
 # data management tasks
@@ -93,70 +116,3 @@ def task_write_to_database(table_def, data):
     except Exception as err:
         logger.error("Failed to write data to %s: %s" % (table_def, err))
 
-
-#def task_normalize_block(data):
-#    try:
-#        norm_data = []
-#        for row in data:
-#            [affil_id, affil_string] = row
-#            normstring = normalize.normalize_string(affil_string, kill_spaces=app.conf.get("NORM_KILL_SPACES", False), upper_case=app.conf.get("NORM_UPPER_CASE", False))
-#            nd = affil_curation.toRow([affil_id, normstring])
-#            norm_data.append(nd)
-#        if norm_data:
-#            task_write_block(affil_norm, norm_data)
-#        else:
-#            logger.warning("Normalize.normalize_block returned no data!")
-#    except Exception as err:
-#        logger.error("Normalize block failed! %s" % err)
-
-
-
-#def task_find_discrepant(data):
-#    if data:
-#        try:
-#            globalDict = {}
-#            discrepant = []
-#            verified = []
-#            for affid, affstring in data:
-#                affnorm = normalize.normalize_string(affstring, kill_spaces=app.conf.get("NORM_KILL_SPACES", False), upper_case=app.conf.get("NORM_UPPER_CASE", False))
-#                affdict = {"affil_id": affid, "affil_string": affstring, "norm_string": affnorm}
-#                if not globalDict.get(affnorm, None):
-#                    globalDict[affnorm] = [affdict]
-#                else:
-#                    globalDict[affnorm].append(affdict)
-#            for k, v in globalDict.items():
-#                if len(v) == 1:
-#                    verified.append({"affil_id": v.get("affil_id"), "norm_string": v.get("norm_string")})
-#                else:
-#                    discrepant.extend(v)
-#            if discrepant:
-#                logger.info("There are %s discrepant pairs" % len(discrepant))
-#            if verified:
-#                task_write_to_database(affil_norm, verified)
-#        except Exception as err:
-#            print("well that's just great: %s" % err)
-
-def task_normalize_all():
-    try:
-        db.clear_table(app, affil_curation)
-    except Exception as err:
-        logger.error("Failed to clear affil_norm table: %s" % err)
-    else:
-        logger.debug("Affil_norm table has been cleared.")
-        try:
-            raw_data = db.fetch_data_table(app, affil_data)
-            logger.debug("Affil_data table has been fetched.")
-            if raw_data:
-                task_find_discrepant(raw_data)
-        except Exception as err:
-            logger.error("Failed to normalize affil_data table: %s" % err)
-        else:
-            logger.info("affil_data has been normalized in affil_norm")
-
-
-def task_unique_norm():
-    try:
-        result = db.query_distinct_norm(app, affil_data)
-        print("lol len(result) = %s" % len(result))
-    except Exception as err:
-        logger.error("Well great. %s" % err)

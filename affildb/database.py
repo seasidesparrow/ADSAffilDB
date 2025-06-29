@@ -88,7 +88,7 @@ def augment_record(app, record, norm):
             alist = auth.split(";")
             author_aff = []
             for a in alist:
-                author_aff.append(query_one_string(app, record, norm))
+                author_aff.append(query_one_string(app, a.strip(), norm))
             author_data.append(author_aff)
         augment_affil = af().parse(author_data)
         return augment_affil

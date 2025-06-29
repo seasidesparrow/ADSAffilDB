@@ -38,6 +38,15 @@ class AffilInst(Base):
         except Exception as err:
             return {"error": err}
                 
+    def toRow(rowdat):
+        if len(rowdat) == 5:
+            return {"inst_country": rowdat[0],
+                    "inst_parents": rowdat[1],
+                    "inst_id": rowdat[2],
+                    "inst_abbreviation": rowdat[3],
+                    "inst_canonical": rowdat[4]}
+        else:
+            return {}
         
 class AffilData(Base):
     """
@@ -56,10 +65,17 @@ class AffilData(Base):
 
     def toJSON(self):
         try:
-            outputJson = {"affil_id": self.affil_id,
+            outputJSON = {"affil_id": self.affil_id,
                           "affil_string": self.affil_string,
-                          "norm_string": self.norm_string,
-                          "error": ""}
-            return outputJson
+                          "norm_string": self.norm_string}
+            return outputJSON
         except Exception as err:
             return {"error": err}
+
+    def toRow(rowdat):
+        if len(rowdat) == 3:
+            return {"affil_id": rowdat[0],
+                    "affil_string": rowdat[1],
+                    "norm_string": rowdat[2]}
+        else:
+            return {}
