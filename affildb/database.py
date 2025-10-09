@@ -28,7 +28,7 @@ class DBWriteException(Exception):
 class DBQueryException(Exception):
     pass
 
-# general use functions,
+# db management functions,
 def clear_table(app, table):
     with app.session_scope() as session:
         try:
@@ -49,6 +49,27 @@ def write_block_to_table(app, table, datablock):
             session.flush()
             raise DBWriteException("Failed to bulk write data block: %s" % err)
 
+def fetch_data_table(app, table):
+    with app.session_scope() as session:
+        try:
+            results = session.query(table).all()
+            raw_data = []
+            for row in results:
+                raw_data.append([row.affil_id, row.affil_string])
+            return raw_data
+        except Exception as err:
+            raise DBQueryException("Unable to query %s for %s: %s" % (str(table), query_string, err))
+
+
+def query_distinct_norm(app, table):
+    with app.session_scope() as session:
+        try:
+            return session.query(table).distinct(table.norm_string).all()
+        except Exception as err:
+            raise DBQueryException("Unable to query %s for distinct normalized strings: %s" % (str(table), err))
+
+
+# augment pipeline functions
 def query_one_string(app, query_string, norm):
     with app.session_scope() as session:
         outputDefault = {}
@@ -65,10 +86,12 @@ def query_one_string(app, query_string, norm):
             else:
                 child_data = inst_id.toJSON()
                 parent_str = child_data.get("inst_parents", "")
+                print("HEY!!! PARENT_STR: %s" % parent_str)
                 parent_data = []
                 if parent_str:
                     parent_id_list = [x.strip() for x in parent_str.split(";")]
                     for p in parent_id_list:
+                        print("PEEEE! %s" % p)
                         try:
                             pdata = session.query(affil_inst).filter(affil_inst.inst_id==p).first().toJSON()
                             parent_data.append(pdata)
@@ -101,21 +124,3 @@ def augment_record(app, record, norm):
             
 
 
-def fetch_data_table(app, table):
-    with app.session_scope() as session:
-        try:
-            results = session.query(table).all()
-            raw_data = []
-            for row in results:
-                raw_data.append([row.affil_id, row.affil_string])
-            return raw_data
-        except Exception as err:
-            raise DBQueryException("Unable to query %s for %s: %s" % (str(table), query_string, err))
-
-
-def query_distinct_norm(app, table):
-    with app.session_scope() as session:
-        try:
-            return session.query(table).distinct(table.norm_string).all()
-        except Exception as err:
-            raise DBQueryException("Unable to query %s for distinct normalized strings: %s" % (str(table), err))
