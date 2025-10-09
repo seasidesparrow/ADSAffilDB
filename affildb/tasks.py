@@ -7,7 +7,7 @@ from sqlalchemy import func
 
 from affildb import app as app_module
 from affildb import normalize, utils
-from affildb.faceter import AffilFaceter as af
+from affildb.augmenter import AffilAugmenter as aa
 
 import affildb.database as db
 
@@ -44,7 +44,7 @@ def augment_record(app, record, norm):
                 res = db.query_one_string(app, query_string, norm)
                 author_aff.append(res)
             author_data.append(author_aff)
-        augment_affil = af().parse(record, author_data)
+        augment_affil = aa().parse(record, author_data)
         return augment_affil
     except Exception as err:
         # print("Welp... %s" % err)
