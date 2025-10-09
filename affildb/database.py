@@ -5,7 +5,7 @@ from sqlalchemy import func, insert
 
 from affildb.models import AffilInst as affil_inst
 from affildb.models import AffilData as affil_data
-from affildb.faceter import AffilFaceter as af
+from affildb.augmenter import AffilAugmenter as aa
 
 proj_home = os.path.realpath(os.path.join(os.path.dirname(__file__), "../"))
 config = load_config(proj_home=proj_home)
@@ -90,7 +90,7 @@ def augment_record(app, record, norm):
             for a in alist:
                 author_aff.append(query_one_string(app, a.strip(), norm))
             author_data.append(author_aff)
-        augment_affil = af().parse(author_data)
+        augment_affil = aa().parse(author_data)
         return augment_affil
     except Exception as err:
         print("Welp... %s" % err)
