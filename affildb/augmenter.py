@@ -1,26 +1,5 @@
 import json
 
-# for testing, use 2025ApJ...978..126Z
-
-'''
-Output augments model:
-{
-  "aff_abbrev": [
-    "ULol/ULol; UWut/IoP",
-    "ULol/IoC; UWut/IoP"
-  ],
-  "aff_facet_hier": [
-    "0/ULol",
-    "1/ULol/ULol",
-    "1/ULol/IoC",
-    "0/UWut",
-    "1/UWut/IoP"
-  ],
-}
-'''
-
-
-
 class AffilAugmenter(object):
 
     def __init__(self):
@@ -104,4 +83,5 @@ class AffilAugmenter(object):
         self.record = record
         self.author_data = author_data
         self._build_output()
+        print(json.dumps(self.output, indent=2, sort_keys=True))
         return self.output
