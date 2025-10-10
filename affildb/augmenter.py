@@ -5,10 +5,6 @@ import json
 '''
 Output augments model:
 {
-  "aff": [
-    "University of Lol, Department of General Science, 101 University Way, Anytown, NE 69361; University of Wut, Institute of Physics", # author 1
-    "University of Lol, Institute of Chemistry, 102 University Way, Anytown, NE 69361; University of Wut, Institute of Physics" # author 2
-  ],
   "aff_abbrev": [
     "ULol/ULol; UWut/IoP",
     "ULol/IoC; UWut/IoP"
@@ -20,11 +16,6 @@ Output augments model:
     "0/UWut",
     "1/UWut/IoP"
   ],
-  "author": [
-    "Lehrer, Jim",
-    "MacNeil, Bob"
-  ],
-  "scixID": "SciX:0000-abcd-9876"
 }
 '''
 
@@ -37,10 +28,6 @@ class AffilAugmenter(object):
 
         
     def _build_aff_id(self):
-    # "aff_id": [
-    #   "B01234; B01256",
-    #   "B01235; B01256"
-    # ],
         aff_id = []
         for auth in self.author_data:
             author_affid_string = "; ".join([a.get("inst_id", "-") for a in auth])
@@ -48,10 +35,6 @@ class AffilAugmenter(object):
         self.aff_id = aff_id
 
     def _build_aff_canonical(self):
-    # "aff_canonical": [
-    #   "University of Lol; University of Wut, Institute of Physics",
-    #   "University of Lol, Institute of Chemistry; University of Wut, Institute of Physics",
-    # ],
         aff_canonical = []
         for auth in self.author_data:
             author_canonical_string = "; ".join([a.get("inst_canonical", "-") for a in auth])
@@ -59,41 +42,58 @@ class AffilAugmenter(object):
         self.aff_canonical = aff_canonical
 
     def _build_aff_country(self):
-    # "aff_country": [
-    #   "United States; United States",
-    #   "United States; United States"
-    # ],
         aff_country = []
         for auth in self.author_data:
             author_country_string = "; ".join([a.get("inst_country", "-") for a in auth])
             aff_country.append(author_country_string)
         self.aff_country = aff_country
 
-    def _build_facets(self):
+    def _build_parents(self):
+        self.aff_facet_hier = []
+        self.aff_abbrev = []
         for auth in self.author_data:
+            auth_aff_abbrev = []
             for aff in auth:
-                print("%s" % json.dumps(aff, indent=2, sort_keys=True))
-                canonical_string = aff.get("inst_canonical", "-")
-                aff_id = aff.get("inst_id", "-")
-                aff_abbrev = aff.get("inst_abbreviation", "-")
-                aff_country = aff.get("inst_country", "-")
                 aff_parents = aff.get("parent_data", [])
-                for p in aff_parents:
-                    parent_abbrev = p.get("inst_abbreviation", "-")
+                aff_abbrev = aff.get("inst_abbreviation", "-")
+                parent_abbrev = [p.get("inst_abbreviation", "-") for p in aff_parents]
+                if parent_abbrev:
+                    pc_list = ["%s/%s" % (p, aff_abbrev) for p in parent_abbrev]
+                    abbrev_string = "; ".join(pc_list)
+                    for p in parent_abbrev:
+                        facet_0 = "0/%s" % p
+                        facet_1 = "1/%s/%s" % (p, aff_abbrev)
+                        if facet_0 not in self.aff_facet_hier:
+                            self.aff_facet_hier.append(facet_0)
+                        if facet_1 not in self.aff_facet_hier:
+                            self.aff_facet_hier.append(facet_1)
+                else:
+                    abbrev_string = "%s/%s" % (aff_abbrev, aff_abbrev)
+                    facet_0 = "0/%s" % aff_abbrev
+                    facet_1 = "1/%s/%s" % (aff_abbrev, aff_abbrev)
+                    if facet_0 not in self.aff_facet_hier:
+                        self.aff_facet_hier.append(facet_0)
+                    if facet_1 not in self.aff_facet_hier:
+                        self.aff_facet_hier.append(facet_1)
+                auth_aff_abbrev.append(abbrev_string)
+            self.aff_abbrev.append("; ".join(auth_aff_abbrev))
+                    
 
     def _build_output(self):
         self.aff = self.record.get("aff", [])
-        #self._build_aff_canonical()
-        #self._build_aff_country()
-        #self._build_aff_id()
-        self._build_facets()
+        self._build_aff_canonical()
+        self._build_aff_country()
+        self._build_aff_id()
+        self._build_parents()
         self.author = self.record.get("author", [])
         self.bibcode = self.record.get("bibcode", "")
         self.scixID = self.record.get("scixID", "")
         self.output = {
             "aff": self.aff,
+            "aff_abbrev": self.aff_abbrev,
             "aff_country": self.aff_country,
             "aff_canonical": self.aff_canonical,
+            "aff_facet_hier": self.aff_facet_heir,
             "aff_id": self.aff_id,
             "author": self.author,
             "bibcode": self.bibcode,
