@@ -93,7 +93,7 @@ class AffilAugmenter(object):
             "aff_abbrev": self.aff_abbrev,
             "aff_country": self.aff_country,
             "aff_canonical": self.aff_canonical,
-            "aff_facet_hier": self.aff_facet_heir,
+            "aff_facet_hier": self.aff_facet_hier,
             "aff_id": self.aff_id,
             "author": self.author,
             "bibcode": self.bibcode,
