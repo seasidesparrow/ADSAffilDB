@@ -33,29 +33,32 @@ class AffilAugmenter(object):
         for auth in self.author_data:
             auth_aff_abbrev = []
             for aff in auth:
-                aff_parents = aff.get("parent_data", [])
                 aff_abbrev = aff.get("inst_abbreviation", "-")
-                parent_abbrev = [p.get("inst_abbreviation", "-") for p in aff_parents]
-                if parent_abbrev:
-                    pc_list = ["%s/%s" % (p, aff_abbrev) for p in parent_abbrev]
-                    abbrev_string = "; ".join(pc_list)
-                    for p in parent_abbrev:
-                        facet_0 = "0/%s" % p
-                        facet_1 = "1/%s/%s" % (p, aff_abbrev)
+                if aff_abbrev == "-":
+                    auth_aff_abbrev.append(aff_abbrev)
+                else:
+                    aff_parents = aff.get("parent_data", [])
+                    parent_abbrev = [p.get("inst_abbreviation", "-") for p in aff_parents]
+                    if parent_abbrev:
+                        pc_list = ["%s/%s" % (p, aff_abbrev) for p in parent_abbrev]
+                        abbrev_string = "; ".join(pc_list)
+                        for p in parent_abbrev:
+                            facet_0 = "0/%s" % p
+                            facet_1 = "1/%s/%s" % (p, aff_abbrev)
+                            if facet_0 not in self.aff_facet_hier:
+                                self.aff_facet_hier.append(facet_0)
+                            if facet_1 not in self.aff_facet_hier:
+                                self.aff_facet_hier.append(facet_1)
+                    else:
+                        abbrev_string = "%s/%s" % (aff_abbrev, aff_abbrev)
+                        facet_0 = "0/%s" % aff_abbrev
+                        facet_1 = "1/%s/%s" % (aff_abbrev, aff_abbrev)
                         if facet_0 not in self.aff_facet_hier:
                             self.aff_facet_hier.append(facet_0)
                         if facet_1 not in self.aff_facet_hier:
                             self.aff_facet_hier.append(facet_1)
-                else:
-                    abbrev_string = "%s/%s" % (aff_abbrev, aff_abbrev)
-                    facet_0 = "0/%s" % aff_abbrev
-                    facet_1 = "1/%s/%s" % (aff_abbrev, aff_abbrev)
-                    if facet_0 not in self.aff_facet_hier:
-                        self.aff_facet_hier.append(facet_0)
-                    if facet_1 not in self.aff_facet_hier:
-                        self.aff_facet_hier.append(facet_1)
-                auth_aff_abbrev.append(abbrev_string)
-            self.aff_abbrev.append("; ".join(auth_aff_abbrev))
+                    auth_aff_abbrev.append(abbrev_string)
+                self.aff_abbrev.append("; ".join(auth_aff_abbrev))
                     
 
     def _build_output(self):
