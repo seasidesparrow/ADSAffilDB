@@ -3,7 +3,7 @@ try:
 except ImportError:
     from adsmutils import get_date, UTCDateTime
 
-from sqlalchemy import Column, Integer, String, Text, Boolean
+from sqlalchemy import Column, Integer, String, Text, Boolean, Index
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -54,6 +54,7 @@ class AffilData(Base):
     """
 
     __tablename__ = "affil_data"
+    __table_args__ = (Index('norm_index', norm_string, postgresql_using="gin"),)
 
     data_key = Column(Integer, primary_key=True, autoincrement=True, unique=True)
     affil_id = Column(String(6), primary_key=True, unique=False, nullable=False)
