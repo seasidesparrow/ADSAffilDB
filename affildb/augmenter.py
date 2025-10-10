@@ -69,17 +69,37 @@ class AffilAugmenter(object):
             aff_country.append(author_country_string)
         self.aff_country = aff_country
 
+    def _build_facets(self):
+        for auth in self.author_data:
+            for aff in auth:
+                print("%s" % json.dumps(aff, indent=2, sort_keys=True))
+                canonical_string = aff.get("inst_canonical", "-")
+                aff_id = aff.get("inst_id", "-")
+                aff_abbrev = aff.get("inst_abbreviation", "-")
+                aff_country = aff.get("inst_country", "-")
+                aff_parents = aff.get("parent_data", [])
+                for p in aff_parents:
+                    parent_abbrev = p.get("inst_abbreviation", "-")
+
     def _build_output(self):
-        self.aff = self.record("aff", [])
-        self._build_aff_canonical()
-        self._build_aff_country()
-        self._build_aff_id()
-        self.author = self.record("author", [])
-        self.bibcode = self.record("bibcode", "")
-        self.scixID = self.record("scixID", "")
+        self.aff = self.record.get("aff", [])
+        #self._build_aff_canonical()
+        #self._build_aff_country()
+        #self._build_aff_id()
+        self._build_facets()
+        self.author = self.record.get("author", [])
+        self.bibcode = self.record.get("bibcode", "")
+        self.scixID = self.record.get("scixID", "")
+        self.output = {
+            "aff": self.aff,
+            "aff_country": self.aff_country,
+            "aff_canonical": self.aff_canonical,
+            "aff_id": self.aff_id,
+            "author": self.author,
+            "bibcode": self.bibcode,
+            "scix_id": self.scixID
+        }
 
     def parse(self, record, author_data):
-        self.record = record
-        self.author_data = author_data
-        print("lol.")
-        return record
+        self._build_output()
+        return self.output

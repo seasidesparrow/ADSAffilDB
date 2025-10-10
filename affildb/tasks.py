@@ -1,3 +1,4 @@
+import html
 import json
 import math
 import os
@@ -25,6 +26,29 @@ app.conf.CELERY_QUEUES = (
 )
 
 def augment_record(app, record, norm):
++    #try:
++    author_data = []
++    affils = record.get("aff", [])
++    for auth in affils:
++        auth = html.unescape(auth)
++        alist = auth.split(";")
++        author_aff = []
++        for a in alist:
++            if norm:
++                query_string = normalize.normalize_string(a,
++                    kill_spaces = app.conf.get("NORM_KILL_SPACES", False),
++                    upper_case = app.conf.get("NORM_UPPER_CASE", False)
++                )
++            else:
++                query_string = normalize.clean_string(a)
++            res = db.query_one_string(app, query_string, norm)
++            author_aff.append(res)
++        author_data.append(author_aff)
++    augment_affil = aa().parse(record, author_data)
++    return augment_affil
++    #except Exception as err:
++    #    print("Welp... %s" % err)
++    #    pass
     try:
         author_data = []
         affils = record.get("aff", [])
@@ -51,7 +75,7 @@ def augment_record(app, record, norm):
         pass
 
 # pipeline tasks
-@app.task(queue="augment")
+#@app.task(queue="augment")
 def task_augment_record_bundle(records, norm=True):
     augments = []
     for rec in records:

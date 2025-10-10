@@ -86,12 +86,10 @@ def query_one_string(app, query_string, norm):
             else:
                 child_data = inst_id.toJSON()
                 parent_str = child_data.get("inst_parents", "")
-                print("HEY!!! PARENT_STR: %s" % parent_str)
                 parent_data = []
                 if parent_str:
                     parent_id_list = [x.strip() for x in parent_str.split(";")]
                     for p in parent_id_list:
-                        print("PEEEE! %s" % p)
                         try:
                             pdata = session.query(affil_inst).filter(affil_inst.inst_id==p).first().toJSON()
                             parent_data.append(pdata)
