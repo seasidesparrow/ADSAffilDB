@@ -58,7 +58,7 @@ class AffilAugmenter(object):
                         if facet_1 not in self.aff_facet_hier:
                             self.aff_facet_hier.append(facet_1)
                     auth_aff_abbrev.append(abbrev_string)
-                self.aff_abbrev.append("; ".join(auth_aff_abbrev))
+            self.aff_abbrev.append("; ".join(auth_aff_abbrev))
                     
 
     def _build_output(self):
