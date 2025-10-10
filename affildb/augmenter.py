@@ -100,6 +100,8 @@ class AffilAugmenter(object):
             "scix_id": self.scixID
         }
 
-    def parse(self, author_data):
+    def parse(self, record, author_data):
+        self.record = record
+        self.author_data = author_data
         self._build_output()
         return self.output
