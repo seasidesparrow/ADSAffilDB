@@ -38,9 +38,9 @@ def upgrade() -> None:
     op.create_table(
         "affil_data",
         sa.Column("data_key", sa.Integer(), autoincrement=True, nullable=False),
-        sa.Column("affil_id", sa.String(), nullable=False),
+        sa.Column("affil_id", sa.String(), index=True, nullable=False),
         sa.Column("affil_string", sa.Text(), nullable=False),
-        sa.Column("norm_string", sa.Text(), nullable=False),
+        sa.Column("norm_string", sa.Text(), index=True, nullable=False),
         sa.Column("flagged", sa.Boolean(), nullable=True),
         sa.Column("created", UTCDateTime, nullable=True, default=get_date),
         sa.Column("updated", UTCDateTime, nullable=True, onupdate=get_date),
@@ -49,13 +49,12 @@ def upgrade() -> None:
         sa.UniqueConstraint("affil_string"),
     )
 
-    op.create_index(
-        "norm_index",
-        "affil_data",
-        ["affil_id", "norm_string"],
-        postgresql_using="GIN",
-        postgresql_ops={'*': 'gin_trgm_ops'}
-    )
+    #op.create_index(
+    #    "norm_index",
+    #    "affil_data",
+    #    ["affil_id", "norm_string"],
+    #    postgresql_using="HASH",
+    #)
 
     op.create_table(
         "affil_curation",
@@ -77,7 +76,7 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     op.drop_table("affil_curation")
-    op.drop_index("norm_index", table_name="affil_data", postgresql_using="GIN")
+    #op.drop_index("norm_index", table_name="affil_data", postgresql_using="GIN")
     op.drop_table("affil_data")
     op.drop_table("affil_inst")
 
