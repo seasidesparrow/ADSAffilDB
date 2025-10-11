@@ -71,6 +71,7 @@ def main():
     elif args.test:
         try:
             with open("./tests/stubdata/2025ApJ...978..126Z_bibdata.json") as fi:
+            #with open("./tests/stubdata/2024PhRvL.132b1803A.json") as fi:
             #with open("./tests/stubdata/test.json") as fi:
                 records = [json.load(fi)]
             tasks.task_augment_record_bundle(records)
