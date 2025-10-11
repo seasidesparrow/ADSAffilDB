@@ -65,7 +65,7 @@ class AffilData(Base):
     created = Column(UTCDateTime, default=get_date, nullable=False)
     updated = Column(UTCDateTime, onupdate=get_date, nullable=False)
 
-    __table_args__ = (Index('norm_index', data_key, affil_id, norm_string, postgresql_using="gin"),)
+    __table_args__ = (Index('norm_index', Text('norm_string, git_trgm_ops'), postgresql_using="gin"),)
 
     def toJSON(self):
         try:
