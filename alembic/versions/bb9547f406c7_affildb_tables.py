@@ -40,7 +40,7 @@ def upgrade() -> None:
         sa.Column("data_key", sa.Integer(), autoincrement=True, nullable=False),
         sa.Column("affil_id", sa.String(), nullable=False),
         sa.Column("affil_string", sa.String(), nullable=False),
-        sa.Column("norm_string", sa.String, nullable=False),
+        sa.Column("norm_string", sa.String(), nullable=False),
         sa.Column("flagged", sa.Boolean(), nullable=True),
         sa.Column("created", UTCDateTime, nullable=True, default=get_date),
         sa.Column("updated", UTCDateTime, nullable=True, onupdate=get_date),
@@ -52,7 +52,7 @@ def upgrade() -> None:
     op.create_index(
         "norm_index",
         "affil_data",
-        ["norm_string"],
+        ["affil_id", "norm_string"],
         postgresql_using="GIN"
     )
 
