@@ -53,7 +53,8 @@ def upgrade() -> None:
         "norm_index",
         "affil_data",
         ["affil_id", "norm_string"],
-        postgresql_using="GIN"
+        postgresql_using="GIN",
+        postgresql_ops={'*': 'gin_trgm_ops'}
     )
 
     op.create_table(
