@@ -42,7 +42,7 @@ class AffilInst(Base):
             return {"error": err}
                 
     def toRow(rowdat):
-        if len(rowdat) == 5:
+        if len(rowdat) == 6:
             return {"inst_iso_country": rowdat[0],
                     "inst_country": rowdat[1],
                     "inst_parents": rowdat[2],
