@@ -50,12 +50,13 @@ def upgrade() -> None:
         sa.UniqueConstraint("affil_string"),
     )
 
-    #op.create_index(
-    #    "norm_index",
-    #    "affil_data",
-    #    ["affil_id", "norm_string"],
-    #    postgresql_using="HASH",
-    #)
+    op.create_index(
+        "norm_index",
+        "affil_data",
+        ["norm_string"],
+        unique=False,
+        postgresql_using="HASH",
+    )
 
     op.create_table(
         "affil_curation",
@@ -77,7 +78,7 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     op.drop_table("affil_curation")
-    #op.drop_index("norm_index", table_name="affil_data", postgresql_using="GIN")
+    op.drop_index("norm_index", table_name="affil_data", postgresql_using="hash")
     op.drop_table("affil_data")
     op.drop_table("affil_inst")
 
