@@ -12,7 +12,7 @@ from affildb.augmenter import AffilAugmenter as aa
 
 import affildb.database as db
 
-proj_home = os.path.realpath(os.path.join(os.path.dirname(__file__), " ../"))
+proj_home = os.path.realpath(os.path.join(os.path.dirname(__file__), "../"))
 app = app_module.ADSAffilDBCelery(
     "affildb-pipeline",
     proj_home=proj_home,
@@ -25,35 +25,35 @@ app.conf.CELERY_QUEUES = (
     Queue("augment", app.exchange, routing_key="augment"),
 )
 
-def augment_record(app, record, norm):
-    #try:
-    author_data = []
-    affils = record.get("aff", [])
-    found = {}
-    for auth in affils:
-        auth = html.unescape(auth)
-        alist = auth.split(";")
-        author_aff = []
-        for a in alist:
-            if norm:
-                query_string = normalize.normalize_string(a,
-                    kill_spaces = app.conf.get("NORM_KILL_SPACES", False),
-                    upper_case = app.conf.get("NORM_UPPER_CASE", False)
-                )
-            else:
-                query_string = normalize.clean_string(a)
-            if found.get(query_string, None):
-                res = found.get(query_string)
-            else:
-                res = db.query_one_string(app, query_string, norm)
-                found[query_string] = res
-            author_aff.append(res)
-        author_data.append(author_aff)
-    augment_affil = aa().parse(record, author_data)
-    return augment_affil
-    #except Exception as err:
-    #    print("Welp... %s" % err)
-    #    pass
+def task_augment_storage_record(app, record, norm):
+    # Task receives msgs with master_pipeline.records.bib_data format
+    try:
+        author_data = []
+        affils = record.get("aff", [])
+        found = {}
+        for auth in affils:
+            auth = html.unescape(auth)
+            alist = auth.split(";")
+            author_aff = []
+            for a in alist:
+                if norm:
+                    query_string = normalize.normalize_string(a,
+                        kill_spaces = app.conf.get("NORM_KILL_SPACES", False),
+                        upper_case = app.conf.get("NORM_UPPER_CASE", False)
+                    )
+                else:
+                    query_string = normalize.clean_string(a)
+                if found.get(query_string, None):
+                    res = found.get(query_string)
+                else:
+                    res = db.query_one_string(app, query_string, norm)
+                    found[query_string] = res
+                author_aff.append(res)
+            author_data.append(author_aff)
+        augment_affil = aa().parse(record, author_data)
+        return augment_affil
+    except Exception as err:
+        logger.error("Record affil augment failed: %s" % err)
 
 # pipeline tasks
 #@app.task(queue="augment")
@@ -68,7 +68,7 @@ def task_augment_record_bundle(records, norm=True):
                    "scix_id": scixID,
                    "author": author,
                    "aff": aff}
-        augmented = augment_record(app, augment, norm)
+        augmented = task_augment_storage_record(app, augment, norm)
         augments.append(augmented)
     # at this point, augments should contain the augment column for
     # all of the records in the bundle.  This would get sent to
