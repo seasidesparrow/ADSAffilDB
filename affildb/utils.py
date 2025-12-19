@@ -30,8 +30,8 @@ def merge_parents(parentChildData):
     if parentChildData:
         pcdict = {}
         for row in parentChildData:
-            child = row[2]
-            parent = row[1]
+            child = row[3]
+            parent = row[2]
             if parent:
                 if pcdict.get(child, None):
                     pcdict[child].append(parent)
@@ -41,10 +41,10 @@ def merge_parents(parentChildData):
         uniqued = []
         seen = {}
         for row in parentChildData:
-            child = row[2]
+            child = row[3]
             if not seen.get(child, None):
                 if pcdict.get(child, None):
-                    row[1] = "; ".join(pcdict[child])
+                    row[2] = "; ".join(pcdict[child])
                 uniqued.append(row)
                 seen[child] = 1
         return uniqued

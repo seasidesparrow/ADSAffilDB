@@ -27,6 +27,13 @@ class AffilAugmenter(object):
             aff_country.append(author_country_string)
         self.aff_country = aff_country
 
+    def _build_aff_iso_country(self):
+        aff_iso_country = []
+        for auth in self.author_data:
+            author_iso_country_string = "; ".join([a.get("inst_iso_country", "-") for a in auth])
+            aff_iso_country.append(author_iso_country_string)
+        self.aff_iso_country = aff_iso_country
+
     def _build_parents(self):
         self.aff_facet_hier = []
         self.aff_abbrev = []
@@ -65,6 +72,7 @@ class AffilAugmenter(object):
         self.aff = self.record.get("aff", [])
         self._build_aff_canonical()
         self._build_aff_country()
+        self._build_aff_iso_country()
         self._build_aff_id()
         self._build_parents()
         self.author = self.record.get("author", [])
@@ -77,6 +85,7 @@ class AffilAugmenter(object):
             "aff_canonical": self.aff_canonical,
             "aff_facet_hier": self.aff_facet_hier,
             "aff_id": self.aff_id,
+            "aff_iso_country": self.aff_iso_country,
             "author": self.author,
             "bibcode": self.bibcode,
             "scix_id": self.scixID

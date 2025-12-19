@@ -18,7 +18,8 @@ class AffilInst(Base):
     inst_parents = Column(String, nullable=True)
     inst_canonical = Column(String, nullable=False)
     inst_abbreviation = Column(String, nullable=False)
-    inst_country = Column(String, nullable=True)
+    inst_country = Column(String, nullable=False)
+    inst_iso_country = Column(String, nullable=False)
     # in place of location, we could consider using GeoAlchemy2 here
     # especially if we can get lat-lon from ROR
     inst_location = Column(String, nullable=True)
@@ -29,7 +30,8 @@ class AffilInst(Base):
 
     def toJSON(self):
         try:
-            outputJson = {"inst_country": self.inst_country,
+            outputJson = {"inst_iso_country": self.inst_iso_country,
+                          "inst_country": self.inst_iso_country,
                           "inst_parents": self.inst_parents,
                           "inst_id": self.inst_id,
                           "inst_abbreviation": self.inst_abbreviation,
@@ -41,11 +43,12 @@ class AffilInst(Base):
                 
     def toRow(rowdat):
         if len(rowdat) == 5:
-            return {"inst_country": rowdat[0],
-                    "inst_parents": rowdat[1],
-                    "inst_id": rowdat[2],
-                    "inst_abbreviation": rowdat[3],
-                    "inst_canonical": rowdat[4]}
+            return {"inst_iso_country": rowdat[0],
+                    "inst_country": rowdat[1],
+                    "inst_parents": rowdat[2],
+                    "inst_id": rowdat[3],
+                    "inst_abbreviation": rowdat[4],
+                    "inst_canonical": rowdat[5]}
         else:
             return {}
         
