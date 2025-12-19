@@ -12,7 +12,7 @@ from affildb.augmenter import AffilAugmenter as aa
 
 import affildb.database as db
 
-proj_home = os.path.realpath(os.path.join(os.path.dirname(__file__), "../"))
+proj_home = os.path.realpath(os.path.join(os.path.dirname(__file__), " ../"))
 app = app_module.ADSAffilDBCelery(
     "affildb-pipeline",
     proj_home=proj_home,
@@ -29,6 +29,7 @@ def augment_record(app, record, norm):
     #try:
     author_data = []
     affils = record.get("aff", [])
+    found = {}
     for auth in affils:
         auth = html.unescape(auth)
         alist = auth.split(";")
@@ -41,7 +42,11 @@ def augment_record(app, record, norm):
                 )
             else:
                 query_string = normalize.clean_string(a)
-            res = db.query_one_string(app, query_string, norm)
+            if found.get(query_string, None):
+                res = found.get(query_string)
+            else:
+                res = db.query_one_string(app, query_string, norm)
+                found[query_string] = res
             author_aff.append(res)
         author_data.append(author_aff)
     augment_affil = aa().parse(record, author_data)
