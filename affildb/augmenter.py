@@ -95,5 +95,4 @@ class AffilAugmenter(object):
         self.record = record
         self.author_data = author_data
         self._build_output()
-        print(json.dumps(self.output, indent=2, sort_keys=True))
         return self.output
