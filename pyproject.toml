@@ -1,6 +1,6 @@
 [project]
 name = "affildb"
-version = "0.2.0"
+version = "0.2.1"
 description = "Affiliation database management pipeline"
 authors = [{ name = "Matthew Templeton", email = "matthew.templeton@cfa.harvard.edu"}]
 license = { text = "MIT" }
