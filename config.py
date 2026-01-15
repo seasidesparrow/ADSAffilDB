@@ -1,10 +1,11 @@
-# Specify where the affiliations database lives
-SQLALCHEMY_DATABASE_URI = "postgresql+psycopg2://user:pwd@localhost:5432/affildb"
-SQLALCHEMY_ECHO = False
-SQLALCHEMY_TRACK_MODIFICATIONS = False
+LOGGING_LEVEL="INFO"
+LOG_STDOUT=True
 
-CELERY_INCLUDE = ["adsaffildb.tasks"]
-CELERY_BROKER = "pyamqp://user:password@localhost:6672/affildb"
+COUNTRY_PARENT_CHILD_FILE = "/proj/ads_abstracts/config/affils/PIPELINE/data/country_parent_child.tsv"
+MATCHED_AFFILS_FILE = "/proj/ads_abstracts/config/affils/PIPELINE/data/affil_strings.txt"
 
-PARENT_CHILD_FILE = "./data/country_parent_child.tsv"
-MATCHED_AFFILS_FILE = "./data/matched_affils.tsv"
+NORM_AFFILS = True
+NORM_KILL_SPACES = True
+NORM_UPPER_CASE = True
+
+DELIMITER = "\t"
