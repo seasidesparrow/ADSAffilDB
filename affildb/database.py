@@ -1,8 +1,6 @@
 import os
 
 from adsputils import load_config, setup_logging
-from sqlalchemy import func, insert
-
 from affildb.models import AffilInst as affil_inst
 from affildb.models import AffilData as affil_data
 from affildb.augmenter import AffilAugmenter as aa
@@ -119,6 +117,3 @@ def augment_record(app, record, norm):
 
 # output is...
 #{'inst_country': 'USA', 'inst_parents': 'A00976', 'inst_id': 'A00977', 'inst_abbreviation': 'Bartol Res Inst', 'inst_canonical': 'University of Delaware, Bartol Research Institute', 'error': '', 'parent_data': [{'inst_country': 'USA', 'inst_parents': '', 'inst_id': 'A00976', 'inst_abbreviation': 'U Delaware', 'inst_canonical': 'University of Delaware', 'error': ''}]}
-            
-
-

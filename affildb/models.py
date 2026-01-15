@@ -59,7 +59,6 @@ class AffilData(Base):
 
     __tablename__ = "affil_data"
 
-
     data_key = Column(Integer, primary_key=True, autoincrement=True, unique=True)
     affil_id = Column(String(6), primary_key=True, unique=False, nullable=False)
     affil_string = Column(Text, unique=True, nullable=False)

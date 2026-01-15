@@ -48,4 +48,3 @@ def merge_parents(parentChildData):
                 uniqued.append(row)
                 seen[child] = 1
         return uniqued
-

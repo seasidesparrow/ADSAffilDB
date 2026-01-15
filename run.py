@@ -1,5 +1,4 @@
 import argparse
-import json
 import os
 from affildb import utils, normalize, tasks
 from adsputils import load_config, setup_logging
